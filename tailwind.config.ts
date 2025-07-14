@@ -26,7 +26,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					glow: 'hsl(var(--primary-glow))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -61,7 +62,29 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				fun: {
+					pink: 'hsl(var(--fun-pink))',
+					yellow: 'hsl(var(--fun-yellow))',
+					orange: 'hsl(var(--fun-orange))',
+					teal: 'hsl(var(--fun-teal))'
+				},
+				success: 'hsl(var(--success))',
+				warning: 'hsl(var(--warning))'
+			},
+			fontFamily: {
+				'comic': ['Comic Neue', 'cursive', 'sans-serif']
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-fun': 'var(--gradient-fun)',
+				'gradient-activity': 'var(--gradient-activity)',
+				'gradient-background': 'var(--gradient-background)'
+			},
+			boxShadow: {
+				'fun': 'var(--shadow-fun)',
+				'card': 'var(--shadow-card)',
+				'activity': 'var(--shadow-activity)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
