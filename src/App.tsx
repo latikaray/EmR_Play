@@ -10,6 +10,9 @@ import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import StoryPage from "./pages/StoryPage";
 import BreathingPage from "./pages/BreathingPage";
+import GratitudeJournalPage from "./pages/GratitudeJournalPage";
+import EmojiMatchPage from "./pages/EmojiMatchPage";
+import EmotionWheelPage from "./pages/EmotionWheelPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +29,9 @@ const App = () => (
             <Route path="/activities" element={<ActivitiesPage />} />
             <Route path="/activities/story" element={<StoryPage />} />
             <Route path="/activities/breathing" element={<BreathingPage />} />
+            <Route path="/activities/gratitude" element={<GratitudeJournalPage />} />
+            <Route path="/activities/emoji-match" element={<EmojiMatchPage />} />
+            <Route path="/activities/emotion-wheel" element={<EmotionWheelPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/login" element={<LoginPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
