@@ -95,32 +95,38 @@ const HomePage = () => {
         </div>
 
         {/* Mood Tracker */}
-        <Card className="bg-gradient-secondary shadow-fun">
+        <Card className="bg-gradient-primary shadow-fun">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-comic text-secondary-foreground">
+            <CardTitle className="text-2xl font-comic text-primary-foreground font-bold">
               What's your mood today? 😊
             </CardTitle>
-            <CardDescription className="text-secondary-foreground/80 font-comic">
+            <CardDescription className="text-primary-foreground/90 font-comic">
               Track your emotions and see how you're feeling
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
               {[
-                { emoji: "😊", label: "Happy", color: "bg-fun-yellow" },
-                { emoji: "😢", label: "Sad", color: "bg-fun-blue" },
-                { emoji: "😡", label: "Angry", color: "bg-fun-red" },
-                { emoji: "😰", label: "Worried", color: "bg-fun-purple" },
-                { emoji: "😴", label: "Tired", color: "bg-fun-gray" },
-                { emoji: "🤗", label: "Excited", color: "bg-fun-pink" },
+                { emoji: "😊", label: "Happy" },
+                { emoji: "😢", label: "Sad" },
+                { emoji: "😡", label: "Angry" },
+                { emoji: "😰", label: "Worried" },
+                { emoji: "😴", label: "Tired" },
+                { emoji: "😎", label: "Excited" },
+                { emoji: "😍", label: "Loved" },
+                { emoji: "😔", label: "Down" },
+                { emoji: "😤", label: "Frustrated" },
+                { emoji: "😌", label: "Calm" },
+                { emoji: "😵", label: "Confused" },
+                { emoji: "🤗", label: "Grateful" },
               ].map((mood) => (
                 <Button
                   key={mood.label}
                   variant="outline"
-                  className={`h-20 flex-col gap-2 hover:scale-105 transition-all duration-200 ${mood.color} hover:bg-opacity-20 border-2 hover:border-primary/30`}
+                  className="h-20 flex-col gap-2 hover:scale-105 transition-all duration-200 bg-white/10 hover:bg-white/20 border-2 border-white/20 hover:border-white/40 backdrop-blur"
                 >
                   <span className="text-2xl">{mood.emoji}</span>
-                  <span className="text-xs font-comic">{mood.label}</span>
+                  <span className="text-xs font-comic text-primary-foreground font-bold">{mood.label}</span>
                 </Button>
               ))}
             </div>
