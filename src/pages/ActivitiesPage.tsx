@@ -32,7 +32,7 @@ const ActivitiesPage = () => {
       progress: 60,
       badges: ["Quick Thinker", "Emotion Expert"],
       color: "bg-fun-yellow",
-      path: "/activities/emoji",
+      path: "/activities/emoji-match",
       isNew: true,
       isCompleted: false
     },
@@ -77,7 +77,7 @@ const ActivitiesPage = () => {
       progress: 20,
       badges: ["Grateful Heart", "Daily Writer"],
       color: "bg-secondary",
-      path: "/activities/journal",
+      path: "/activities/gratitude",
       isNew: false,
       isCompleted: false
     },
@@ -92,7 +92,7 @@ const ActivitiesPage = () => {
       progress: 0,
       badges: ["Emotion Explorer", "Wheel Master"],
       color: "bg-fun-orange",
-      path: "/activities/wheel",
+      path: "/activities/emotion-wheel",
       isNew: true,
       isCompleted: false
     }
