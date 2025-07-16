@@ -3,24 +3,31 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Heart, Star, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Sparkles, Heart, Star, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
-const LoginPage = () => {
+const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
+    confirmPassword: ""
   });
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signUp } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (formData.password !== formData.confirmPassword) {
+      return;
+    }
+    
     setLoading(true);
-    const { error } = await signIn(formData.email, formData.password);
+    const { error } = await signUp(formData.email, formData.password);
     
     if (!error) {
       navigate('/');
@@ -55,22 +62,22 @@ const LoginPage = () => {
             </h1>
           </div>
           <p className="text-lg text-muted-foreground font-comic">
-            Welcome back to your emotional adventure! 🌟
+            Start your emotional adventure today! 🌟
           </p>
         </div>
 
-        {/* Login Form */}
+        {/* Sign Up Form */}
         <Card className="shadow-fun bg-card/80 backdrop-blur border-2 border-primary/20 hover-lift">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-comic text-foreground">
-              Sign In
+              Create Account
             </CardTitle>
             <CardDescription className="font-comic">
-              Continue your emotional learning journey
+              Join thousands of kids learning about emotions!
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleSignUp} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="font-comic text-foreground">
                   Email Address
@@ -116,17 +123,44 @@ const LoginPage = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-sm">
-                <Link 
-                  to="/forgot-password" 
-                  className="text-primary hover:underline font-comic"
-                >
-                  Forgot password?
-                </Link>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="font-comic text-foreground">
+                  Confirm Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                    className="pl-10 pr-10 font-comic"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+                {formData.password !== formData.confirmPassword && formData.confirmPassword && (
+                  <p className="text-sm text-destructive font-comic">Passwords don't match</p>
+                )}
               </div>
 
-              <Button type="submit" variant="fun" size="lg" className="w-full" disabled={loading}>
-                {loading ? "Signing In..." : "Sign In & Play! 🚀"}
+              <Button 
+                type="submit" 
+                variant="fun" 
+                size="lg" 
+                className="w-full"
+                disabled={loading || formData.password !== formData.confirmPassword}
+              >
+                {loading ? "Creating Account..." : "Create Account & Start Playing! 🚀"}
               </Button>
             </form>
           </CardContent>
@@ -148,23 +182,23 @@ const LoginPage = () => {
           </CardContent>
         </Card>
 
-        {/* Sign Up Link */}
+        {/* Sign In Link */}
         <div className="text-center">
           <p className="text-sm text-muted-foreground font-comic">
-            New to EMR Play?{" "}
+            Already have an account?{" "}
             <Link 
-              to="/signup" 
+              to="/login" 
               className="text-primary hover:underline font-bold"
             >
-              Create an account
+              Sign in here
             </Link>
           </p>
         </div>
 
-        {/* Supabase Notice */}
+        {/* Security Notice */}
         <Card className="bg-gradient-primary text-primary-foreground shadow-fun">
           <CardContent className="p-4 text-center">
-            <h4 className="font-bold font-comic mb-2">🔒 Secure & Safe</h4>
+            <h4 className="font-bold font-comic mb-2">🔒 Safe & Secure</h4>
             <p className="text-sm opacity-90 font-comic">
               Your child's data is protected with enterprise-grade security. 
               We never share personal information.
@@ -176,4 +210,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default SignUpPage;

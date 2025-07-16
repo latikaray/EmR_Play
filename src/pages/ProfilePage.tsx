@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { 
   User, 
   Calendar, 
@@ -17,8 +18,12 @@ import {
   Target,
   Award,
   Sparkles,
-  TrendingUp
+  TrendingUp,
+  LogOut,
+  Trash2
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -28,6 +33,9 @@ const ProfilePage = () => {
     favoriteColor: "Rainbow",
     avatar: ""
   });
+  const { user, signOut, deleteAccount } = useAuth();
+  const navigate = useNavigate();
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const achievements = [
     { name: "First Drawing", icon: "🎨", date: "2024-01-15", description: "Completed your first mood drawing!" },
@@ -55,6 +63,22 @@ const ProfilePage = () => {
   const handleSave = () => {
     setIsEditing(false);
     // In a real app, this would save to Supabase
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/login');
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleteLoading(true);
+    const { error } = await deleteAccount();
+    
+    if (!error) {
+      navigate('/signup');
+    }
+    
+    setDeleteLoading(false);
   };
 
   return (
@@ -260,6 +284,72 @@ const ProfilePage = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Account Actions */}
+        {user && (
+          <Card className="shadow-fun bg-card/80 backdrop-blur border-2 border-primary/20">
+            <CardHeader>
+              <CardTitle className="text-xl font-comic text-foreground flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                Account Settings
+              </CardTitle>
+              <CardDescription className="font-comic">
+                Manage your account and data
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={handleLogout}
+                  className="flex-1 font-comic"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Log Out
+                </Button>
+                
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="destructive" 
+                      className="flex-1 font-comic"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Account
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="bg-card/95 backdrop-blur border-2 border-destructive/20">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="font-comic text-foreground flex items-center gap-2">
+                        <Trash2 className="h-5 w-5 text-destructive" />
+                        Delete Account Forever?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="font-comic">
+                        ⚠️ <strong>Warning:</strong> This action cannot be undone! 
+                        <br /><br />
+                        All your progress, achievements, mood history, and account data will be permanently lost.
+                        <br /><br />
+                        Are you absolutely sure you want to delete your account?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="font-comic">
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={handleDeleteAccount}
+                        disabled={deleteLoading}
+                        className="bg-destructive hover:bg-destructive/90 font-comic"
+                      >
+                        {deleteLoading ? "Deleting..." : "Yes, Delete Forever"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
