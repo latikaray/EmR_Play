@@ -24,7 +24,7 @@ const HomePage = () => {
       description: "Match emotions with fun emoji games",
       icon: "😊",
       color: "bg-fun-yellow",
-      path: "/activities/emoji"
+      path: "/activities/emoji-match"
     },
     {
       title: "Story Time",
@@ -45,7 +45,14 @@ const HomePage = () => {
       description: "Write about things that make you happy",
       icon: "📝",
       color: "bg-secondary",
-      path: "/activities/journal"
+      path: "/activities/gratitude"
+    },
+    {
+      title: "Emotion Wheel",
+      description: "Spin the wheel to explore different emotions",
+      icon: "🎯",
+      color: "bg-fun-orange",
+      path: "/activities/emotion-wheel"
     },
   ];
 
