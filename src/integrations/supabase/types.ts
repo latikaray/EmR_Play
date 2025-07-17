@@ -14,7 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_completions: {
+        Row: {
+          activity_name: string
+          activity_type: string
+          child_user_id: string | null
+          completed_at: string
+          eq_trait: string | null
+          id: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_name: string
+          activity_type: string
+          child_user_id?: string | null
+          completed_at?: string
+          eq_trait?: string | null
+          id?: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_name?: string
+          activity_type?: string
+          child_user_id?: string | null
+          completed_at?: string
+          eq_trait?: string | null
+          id?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      journal_entries: {
+        Row: {
+          content: string
+          created_at: string
+          date: string
+          id: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          date?: string
+          id?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          date?: string
+          id?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mood_entries: {
+        Row: {
+          child_user_id: string | null
+          created_at: string
+          date: string
+          id: string
+          mood_emoji: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          child_user_id?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          mood_emoji: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          child_user_id?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          mood_emoji?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +142,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "child" | "parent"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +269,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["child", "parent"],
+    },
   },
 } as const
