@@ -147,6 +147,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         if (profileError) {
           console.error('Error creating profile:', profileError);
+        } else {
+          // Immediately set the profile in context after successful creation
+          setProfile({
+            id: '', // This will be set by the database
+            user_id: data.user.id,
+            role,
+            display_name: displayName || null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
         }
       }
       

@@ -33,9 +33,8 @@ const SignUpPage = () => {
     setLoading(true);
     const { error } = await signUp(formData.email, formData.password, formData.role, formData.name);
     
-    if (!error) {
-      navigate('/');
-    }
+    // Let the App.tsx routing handle navigation based on role
+    // No manual navigation needed here
     
     setLoading(false);
   };

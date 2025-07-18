@@ -22,9 +22,8 @@ const LoginPage = () => {
     setLoading(true);
     const { error } = await signIn(formData.email, formData.password);
     
-    if (!error) {
-      navigate('/');
-    }
+    // Let the App.tsx routing handle navigation based on role
+    // No manual navigation needed here
     
     setLoading(false);
   };
