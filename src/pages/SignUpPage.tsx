@@ -18,6 +18,7 @@ const SignUpPage = () => {
     confirmPassword: "",
     role: "child" as UserRole
   });
+  const [demoRole, setDemoRole] = useState<UserRole>("child");
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
@@ -40,7 +41,11 @@ const SignUpPage = () => {
   };
 
   const handleDemoMode = () => {
-    navigate("/");
+    if (demoRole === "parent") {
+      navigate("/parent");
+    } else {
+      navigate("/");
+    }
   };
 
   return (
@@ -156,6 +161,25 @@ const SignUpPage = () => {
                 )}
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="role" className="font-comic text-foreground">
+                  I am signing up as
+                </Label>
+                <Select value={formData.role} onValueChange={(value: UserRole) => setFormData({...formData, role: value})}>
+                  <SelectTrigger className="font-comic">
+                    <SelectValue placeholder="Choose your role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="child" className="font-comic">
+                      🧒 Child - Let's learn about emotions!
+                    </SelectItem>
+                    <SelectItem value="parent" className="font-comic">
+                      👨‍👩‍👧‍👦 Parent - Help my child grow emotionally
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <Button 
                 type="submit" 
                 variant="fun" 
@@ -171,10 +195,28 @@ const SignUpPage = () => {
 
         {/* Demo Mode */}
         <Card className="shadow-card bg-card/50 backdrop-blur border border-accent/30">
-          <CardContent className="p-4 text-center">
-            <p className="text-sm text-muted-foreground font-comic mb-3">
+          <CardContent className="p-4 text-center space-y-4">
+            <p className="text-sm text-muted-foreground font-comic">
               Want to try EMR Play first?
             </p>
+            <div className="space-y-2">
+              <Label className="font-comic text-foreground text-sm">
+                Try as
+              </Label>
+              <Select value={demoRole} onValueChange={(value: UserRole) => setDemoRole(value)}>
+                <SelectTrigger className="font-comic">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="child" className="font-comic">
+                    🧒 Child
+                  </SelectItem>
+                  <SelectItem value="parent" className="font-comic">
+                    👨‍👩‍👧‍👦 Parent
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Button 
               variant="outline" 
               onClick={handleDemoMode}
