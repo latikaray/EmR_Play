@@ -58,6 +58,7 @@ const AppRouter = () => {
         <Route path="/parent/child-progress" element={user && profile?.role === 'parent' ? <ChildProgressPage /> : !user ? <ChildProgressPage /> : <Navigate to="/login" replace />} />
         
         {/* Shared routes */}
+        <Route path="/progress" element={<ChildProgressPage />} />
         <Route path="/child-progress" element={user && profile?.role === 'child' ? <ChildProgressPage /> : !user ? <ChildProgressPage /> : <Navigate to="/login" replace />} />
         <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/login" replace />} />
         
