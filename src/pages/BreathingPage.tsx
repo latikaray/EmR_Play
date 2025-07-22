@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Play, Pause, RotateCcw, Star, Clock, Heart, Brain, Zap } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowLeft, Play, Pause, RotateCcw, Star, Clock, Heart, Brain, Zap, CheckCircle } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useActivityProgress } from "@/hooks/useActivityProgress";
 
 interface Exercise {
   id: string;
@@ -25,6 +26,10 @@ const BreathingPage = () => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [currentCycle, setCurrentCycle] = useState(1);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isRecordingCompletion, setIsRecordingCompletion] = useState(false);
+  
+  const navigate = useNavigate();
+  const { recordActivityCompletion } = useActivityProgress();
 
   const exercises: Exercise[] = [
     {
@@ -114,6 +119,7 @@ const BreathingPage = () => {
               if (currentCycle >= selectedExercise.breathPattern.cycles) {
                 setIsActive(false);
                 setIsCompleted(true);
+                completeBreathingExercise();
                 return 0;
               } else {
                 setCurrentCycle(prev => prev + 1);
@@ -169,6 +175,26 @@ const BreathingPage = () => {
       case 'hold': return 'scale-125';
       case 'out': return 'scale-75';
       default: return 'scale-75';
+    }
+  };
+
+  const completeBreathingExercise = async () => {
+    if (!selectedExercise || isRecordingCompletion) return;
+    
+    setIsRecordingCompletion(true);
+    try {
+      const completionNotes = `Completed breathing exercise: ${selectedExercise.title}. ${selectedExercise.breathPattern.cycles} cycles of ${selectedExercise.breathPattern.in}s in, ${selectedExercise.breathPattern.hold}s hold, ${selectedExercise.breathPattern.out}s out.`;
+      
+      await recordActivityCompletion(
+        selectedExercise.title,
+        "mindfulness",
+        "Emotional Regulation",
+        completionNotes
+      );
+    } catch (error) {
+      console.error('Error completing breathing exercise:', error);
+    } finally {
+      setIsRecordingCompletion(false);
     }
   };
 
@@ -251,13 +277,23 @@ const BreathingPage = () => {
                 <Card className="bg-success/10 border-success">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-center gap-2 mb-2">
-                      <Star className="h-5 w-5 text-success" />
-                      <h3 className="text-lg font-bold text-success font-comic">Great Job!</h3>
-                      <Star className="h-5 w-5 text-success" />
+                      <CheckCircle className="h-5 w-5 text-success" />
+                      <h3 className="text-lg font-bold text-success font-comic">
+                        {isRecordingCompletion ? "Saving Progress..." : "Great Job! 🎉"}
+                      </h3>
+                      <CheckCircle className="h-5 w-5 text-success" />
                     </div>
-                    <p className="text-success font-comic">
+                    <p className="text-success font-comic mb-3">
                       You completed the {selectedExercise.title} exercise! How do you feel now?
                     </p>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate("/activities")}
+                      className="font-comic bg-success/10 border-success text-success hover:bg-success/20"
+                    >
+                      Back to Activities ✨
+                    </Button>
                   </CardContent>
                 </Card>
               )}

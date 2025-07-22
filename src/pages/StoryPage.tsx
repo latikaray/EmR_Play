@@ -12,7 +12,8 @@ import {
   CheckCircle,
   RotateCcw
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useActivityProgress } from "@/hooks/useActivityProgress";
 
 interface Story {
   id: string;
@@ -146,6 +147,10 @@ const StoryPage = () => {
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [currentPart, setCurrentPart] = useState(0);
   const [completedChecks, setCompletedChecks] = useState<number[]>([]);
+  const [isCompleting, setIsCompleting] = useState(false);
+  
+  const navigate = useNavigate();
+  const { recordActivityCompletion } = useActivityProgress();
 
   const stories: Story[] = [
     {
@@ -391,6 +396,32 @@ const StoryPage = () => {
     setCompletedChecks([]);
   };
 
+  const completeStory = async () => {
+    if (!selectedStory || isCompleting) return;
+    
+    setIsCompleting(true);
+    try {
+      const completionNotes = `Completed story: ${selectedStory.title}. Learned about: ${selectedStory.empathySkills.join(", ")}. Moral: ${selectedStory.moral}`;
+      
+      await recordActivityCompletion(
+        selectedStory.title,
+        "story",
+        "Empathy",
+        completionNotes
+      );
+      
+      // Navigate back to activities page after a brief delay
+      setTimeout(() => {
+        navigate("/activities");
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error completing story:', error);
+    } finally {
+      setIsCompleting(false);
+    }
+  };
+
   if (!selectedStory) {
     return (
       <div className="min-h-screen bg-gradient-background p-4 md:p-6">
@@ -581,11 +612,12 @@ const StoryPage = () => {
           ) : (
             <Button 
               variant="fun" 
-              onClick={backToStories}
+              onClick={completeStory}
+              disabled={isCompleting}
               className="font-comic"
             >
               <Star className="h-4 w-4 mr-2" />
-              Story Complete!
+              {isCompleting ? "Saving Progress..." : "Complete Story! ✨"}
             </Button>
           )}
         </div>

@@ -3,9 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Star, Clock, Users, Trophy, ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useActivityProgress } from "@/hooks/useActivityProgress";
 
 const ActivitiesPage = () => {
-  const activities = [
+  const { getActivityProgress, getTotalStats, loading } = useActivityProgress();
+  
+  const baseActivities = [
     {
       id: "draw-mood",
       title: "Draw Your Mood",
@@ -14,12 +17,11 @@ const ActivitiesPage = () => {
       difficulty: "Easy",
       duration: "10-15 min",
       participants: "Solo",
-      progress: 80,
       badges: ["Creative", "Expressive"],
       color: "bg-fun-pink",
       path: "/activities/draw",
-      isNew: false,
-      isCompleted: false
+      activityType: "creative",
+      eqTrait: "Self-Awareness"
     },
     {
       id: "emoji-match",
@@ -29,12 +31,11 @@ const ActivitiesPage = () => {
       difficulty: "Medium",
       duration: "5-10 min",
       participants: "Solo",
-      progress: 60,
       badges: ["Quick Thinker", "Emotion Expert"],
       color: "bg-fun-yellow",
       path: "/activities/emoji-match",
-      isNew: true,
-      isCompleted: false
+      activityType: "game",
+      eqTrait: "Emotional Regulation"
     },
     {
       id: "story-time",
@@ -44,12 +45,11 @@ const ActivitiesPage = () => {
       difficulty: "Easy",
       duration: "15-20 min",
       participants: "Solo or with family",
-      progress: 100,
       badges: ["Story Master", "Empathy Hero"],
       color: "bg-accent",
       path: "/activities/story",
-      isNew: false,
-      isCompleted: true
+      activityType: "story",
+      eqTrait: "Empathy"
     },
     {
       id: "breathing",
@@ -59,12 +59,11 @@ const ActivitiesPage = () => {
       difficulty: "Easy",
       duration: "5-10 min",
       participants: "Solo",
-      progress: 40,
       badges: ["Zen Master", "Calm Champion"],
       color: "bg-fun-teal",
       path: "/activities/breathing",
-      isNew: false,
-      isCompleted: false
+      activityType: "mindfulness",
+      eqTrait: "Emotional Regulation"
     },
     {
       id: "gratitude",
@@ -74,12 +73,11 @@ const ActivitiesPage = () => {
       difficulty: "Easy",
       duration: "10-15 min",
       participants: "Solo",
-      progress: 20,
       badges: ["Grateful Heart", "Daily Writer"],
       color: "bg-secondary",
       path: "/activities/gratitude",
-      isNew: false,
-      isCompleted: false
+      activityType: "journal",
+      eqTrait: "Self-Awareness"
     },
     {
       id: "emotion-wheel",
@@ -89,14 +87,28 @@ const ActivitiesPage = () => {
       difficulty: "Medium",
       duration: "8-12 min",
       participants: "Solo",
-      progress: 0,
       badges: ["Emotion Explorer", "Wheel Master"],
       color: "bg-fun-orange",
       path: "/activities/emotion-wheel",
-      isNew: true,
-      isCompleted: false
+      activityType: "educational",
+      eqTrait: "Self-Awareness"
     }
   ];
+
+  // Get real progress data for each activity
+  const activities = baseActivities.map(activity => {
+    const progressData = getActivityProgress(activity.id);
+    return {
+      ...activity,
+      progress: progressData.progress,
+      completions: progressData.completions,
+      isCompleted: progressData.completions > 0,
+      isNew: progressData.completions === 0,
+      lastCompleted: progressData.lastCompleted
+    };
+  });
+
+  const stats = getTotalStats();
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -129,29 +141,35 @@ const ActivitiesPage = () => {
           <Card className="hover-lift shadow-card bg-card/50 backdrop-blur">
             <CardContent className="p-4 text-center">
               <Trophy className="h-6 w-6 mx-auto mb-2 text-fun-yellow" />
-              <p className="text-xl font-bold text-foreground font-comic">6</p>
+              <p className="text-xl font-bold text-foreground font-comic">{baseActivities.length}</p>
               <p className="text-sm text-muted-foreground font-comic">Total Activities</p>
             </CardContent>
           </Card>
           <Card className="hover-lift shadow-card bg-card/50 backdrop-blur">
             <CardContent className="p-4 text-center">
               <Star className="h-6 w-6 mx-auto mb-2 text-fun-pink" />
-              <p className="text-xl font-bold text-foreground font-comic">1</p>
+              <p className="text-xl font-bold text-foreground font-comic">
+                {loading ? "..." : activities.filter(a => a.completions > 0).length}
+              </p>
               <p className="text-sm text-muted-foreground font-comic">Completed</p>
             </CardContent>
           </Card>
           <Card className="hover-lift shadow-card bg-card/50 backdrop-blur">
             <CardContent className="p-4 text-center">
               <Clock className="h-6 w-6 mx-auto mb-2 text-accent" />
-              <p className="text-xl font-bold text-foreground font-comic">5</p>
+              <p className="text-xl font-bold text-foreground font-comic">
+                {loading ? "..." : activities.filter(a => a.progress > 0 && a.progress < 100).length}
+              </p>
               <p className="text-sm text-muted-foreground font-comic">In Progress</p>
             </CardContent>
           </Card>
           <Card className="hover-lift shadow-card bg-card/50 backdrop-blur">
             <CardContent className="p-4 text-center">
               <Users className="h-6 w-6 mx-auto mb-2 text-secondary" />
-              <p className="text-xl font-bold text-foreground font-comic">2</p>
-              <p className="text-sm text-muted-foreground font-comic">New</p>
+              <p className="text-xl font-bold text-foreground font-comic">
+                {loading ? "..." : stats.totalCompletions}
+              </p>
+              <p className="text-sm text-muted-foreground font-comic">Total Completions</p>
             </CardContent>
           </Card>
         </div>
@@ -167,7 +185,7 @@ const ActivitiesPage = () => {
               )}
               {activity.isCompleted && (
                 <Badge className="absolute top-2 right-2 bg-success text-white font-comic z-10">
-                  ✓ Done
+                  ✓ {activity.completions}x
                 </Badge>
               )}
               

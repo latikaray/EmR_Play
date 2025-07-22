@@ -1,61 +1,49 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   TrendingUp, 
   Heart, 
-  Calendar as CalendarIcon, 
   Target, 
   MessageSquare, 
   BarChart3,
-  ArrowLeft,
-  Plus,
-  Smile,
-  Frown,
-  Meh,
-  Laugh,
-  Angry
+  ArrowLeft
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-
-interface MoodEntry {
-  id: string;
-  mood_emoji: string;
-  date: string;
-  notes?: string;
-}
-
-interface ActivityCompletion {
-  id: string;
-  activity_name: string;
-  activity_type: string;
-  eq_trait?: string;
-  completed_at: string;
-  notes?: string;
-}
+import { useActivityProgress } from "@/hooks/useActivityProgress";
+import { useMoodProgress } from "@/hooks/useMoodProgress";
 
 const ChildProgressPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([]);
-  const [activityCompletions, setActivityCompletions] = useState<ActivityCompletion[]>([]);
   const [newMoodEmoji, setNewMoodEmoji] = useState("");
   const [moodNotes, setMoodNotes] = useState("");
   const [feedback, setFeedback] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [savingMood, setSavingMood] = useState(false);
   
   const { user, profile } = useAuth();
-  const { toast } = useToast();
+  
+  // Use custom hooks for real-time data
+  const { 
+    activityCompletions, 
+    getTotalStats, 
+    loading: activitiesLoading 
+  } = useActivityProgress();
+  
+  const { 
+    moodEntries, 
+    saveMoodEntry, 
+    getMoodForDate, 
+    getRecentMoods, 
+    getMoodStats,
+    loading: moodLoading 
+  } = useMoodProgress();
 
   const moodEmojis = [
     { emoji: "😊", name: "Happy", color: "text-green-500" },
@@ -73,78 +61,18 @@ const ChildProgressPage = () => {
     "Motivation", "Communication", "Problem Solving", "Confidence"
   ];
 
-  useEffect(() => {
-    if (user) {
-      fetchMoodEntries();
-      fetchActivityCompletions();
-    }
-  }, [user]);
+  const handleSaveMood = async () => {
+    if (!newMoodEmoji) return;
 
-  const fetchMoodEntries = async () => {
-    if (!user) return;
-
+    setSavingMood(true);
     try {
-      const { data, error } = await supabase
-        .from('mood_entries')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false });
-
-      if (error) throw error;
-      setMoodEntries(data || []);
-    } catch (error) {
-      console.error('Error fetching mood entries:', error);
-    }
-  };
-
-  const fetchActivityCompletions = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('activity_completions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('completed_at', { ascending: false });
-
-      if (error) throw error;
-      setActivityCompletions(data || []);
-    } catch (error) {
-      console.error('Error fetching activity completions:', error);
-    }
-  };
-
-  const saveMoodEntry = async () => {
-    if (!user || !newMoodEmoji) return;
-
-    setLoading(true);
-    try {
-      const { error } = await supabase
-        .from('mood_entries')
-        .upsert({
-          user_id: user.id,
-          mood_emoji: newMoodEmoji,
-          date: format(selectedDate, 'yyyy-MM-dd'),
-          notes: moodNotes || null
-        }, {
-          onConflict: 'user_id,date'
-        });
-
-      if (error) throw error;
-
-      toast({ title: "Mood saved successfully!" });
-      await fetchMoodEntries();
+      await saveMoodEntry(selectedDate, newMoodEmoji, moodNotes);
       setNewMoodEmoji("");
       setMoodNotes("");
     } catch (error) {
-      console.error('Error saving mood:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save mood entry",
-        variant: "destructive"
-      });
+      console.error('Error in handleSaveMood:', error);
     } finally {
-      setLoading(false);
+      setSavingMood(false);
     }
   };
 
@@ -153,23 +81,9 @@ const ChildProgressPage = () => {
     return traitActivities.length;
   };
 
-  const getMoodForDate = (date: Date) => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return moodEntries.find(entry => entry.date === dateStr);
-  };
-
-  const getRecentMoods = () => {
-    const last7Days = Array.from({length: 7}, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      return date;
-    });
-
-    return last7Days.map(date => ({
-      date: format(date, 'MMM d'),
-      mood: getMoodForDate(date)?.mood_emoji || "😑"
-    }));
-  };
+  const totalStats = getTotalStats();
+  const moodStats = getMoodStats();
+  const recentMoods = getRecentMoods(7);
 
   return (
     <div className="min-h-screen bg-gradient-background">
@@ -209,11 +123,11 @@ const ChildProgressPage = () => {
                   <Heart className="h-8 w-8 text-primary mx-auto mb-2" />
                   <CardTitle className="font-comic">Activities Completed</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center">
-                  <div className="text-4xl font-bold text-primary font-comic">
-                    {activityCompletions.length}
-                  </div>
-                </CardContent>
+                 <CardContent className="text-center">
+                   <div className="text-4xl font-bold text-primary font-comic">
+                     {activitiesLoading ? "..." : totalStats.totalCompletions}
+                   </div>
+                 </CardContent>
               </Card>
 
               <Card className="shadow-fun bg-card/80 backdrop-blur border-2 border-primary/20">
@@ -221,11 +135,11 @@ const ChildProgressPage = () => {
                   <TrendingUp className="h-8 w-8 text-primary mx-auto mb-2" />
                   <CardTitle className="font-comic">Mood Entries</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center">
-                  <div className="text-4xl font-bold text-primary font-comic">
-                    {moodEntries.length}
-                  </div>
-                </CardContent>
+                 <CardContent className="text-center">
+                   <div className="text-4xl font-bold text-primary font-comic">
+                     {moodLoading ? "..." : moodStats.totalEntries}
+                   </div>
+                 </CardContent>
               </Card>
 
               <Card className="shadow-fun bg-card/80 backdrop-blur border-2 border-primary/20">
@@ -233,11 +147,11 @@ const ChildProgressPage = () => {
                   <Target className="h-8 w-8 text-primary mx-auto mb-2" />
                   <CardTitle className="font-comic">EQ Traits Practiced</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center">
-                  <div className="text-4xl font-bold text-primary font-comic">
-                    {eqTraits.filter(trait => getTraitProgress(trait) > 0).length}
-                  </div>
-                </CardContent>
+                 <CardContent className="text-center">
+                   <div className="text-4xl font-bold text-primary font-comic">
+                     {activitiesLoading ? "..." : totalStats.uniqueEQTraits}
+                   </div>
+                 </CardContent>
               </Card>
             </div>
 
@@ -247,16 +161,20 @@ const ChildProgressPage = () => {
                 <CardTitle className="font-comic">Recent Mood Trend</CardTitle>
                 <CardDescription className="font-comic">Last 7 days</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex justify-between items-center">
-                  {getRecentMoods().reverse().map((day, index) => (
-                    <div key={index} className="text-center">
-                      <div className="text-2xl mb-2">{day.mood}</div>
-                      <div className="text-xs text-muted-foreground font-comic">{day.date}</div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
+               <CardContent>
+                 <div className="flex justify-between items-center">
+                   {moodLoading ? (
+                     <div className="text-center w-full font-comic">Loading...</div>
+                   ) : (
+                     recentMoods.reverse().map((day, index) => (
+                       <div key={index} className="text-center">
+                         <div className="text-2xl mb-2">{day.mood}</div>
+                         <div className="text-xs text-muted-foreground font-comic">{day.date}</div>
+                       </div>
+                     ))
+                   )}
+                 </div>
+               </CardContent>
             </Card>
           </TabsContent>
 
@@ -316,14 +234,14 @@ const ChildProgressPage = () => {
                     />
                   </div>
 
-                  <Button 
-                    onClick={saveMoodEntry}
-                    disabled={!newMoodEmoji || loading}
-                    variant="fun"
-                    className="w-full"
-                  >
-                    {loading ? "Saving..." : "Save Mood"}
-                  </Button>
+                   <Button 
+                     onClick={handleSaveMood}
+                     disabled={!newMoodEmoji || savingMood}
+                     variant="fun"
+                     className="w-full"
+                   >
+                     {savingMood ? "Saving..." : "Save Mood"}
+                   </Button>
                 </CardContent>
               </Card>
             </div>
