@@ -9,6 +9,7 @@ import ActivitiesPage from "./pages/ActivitiesPage";
 import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import StoryPage from "./pages/StoryPage";
 import BreathingPage from "./pages/BreathingPage";
 import GratitudeJournalPage from "./pages/GratitudeJournalPage";
@@ -40,6 +41,7 @@ const AppRouter = () => {
         {/* Public routes */}
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to={profile?.role === 'parent' ? '/parent' : '/'} replace />} />
         <Route path="/signup" element={!user ? <SignUpPage /> : <Navigate to={profile?.role === 'parent' ? '/parent' : '/'} replace />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         
         {/* Protected routes - Child */}
         <Route path="/" element={<HomePage />} />
