@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,18 +24,26 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: "Alex Johnson",
+    name: "",
     age: "8",
     favoriteColor: "Rainbow",
     avatar: ""
   });
-  const { user, signOut, deleteAccount } = useAuth();
+  const { user, signOut, deleteAccount, profile } = useAuth();
   const navigate = useNavigate();
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  useEffect(() => {
+    if (profile?.display_name) {
+      setProfileData((p) => ({ ...p, name: profile.display_name || "" }));
+    }
+  }, [profile?.display_name]);
 
   const achievements = [
     { name: "First Drawing", icon: "🎨", date: "2024-01-15", description: "Completed your first mood drawing!" },
@@ -60,9 +68,18 @@ const ProfilePage = () => {
     { label: "Mood Score", value: "8.5", icon: Star, color: "text-secondary" },
   ];
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsEditing(false);
-    // In a real app, this would save to Supabase
+    if (!user) return;
+    const { error } = await supabase
+      .from('profiles')
+      .update({ display_name: profileData.name })
+      .eq('user_id', user.id);
+    if (error) {
+      toast.error("Failed to update profile");
+    } else {
+      toast.success("Profile updated");
+    }
   };
 
   const handleLogout = async () => {

@@ -40,14 +40,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .from('profiles')
         .select('*')
         .eq('user_id', userId)
-        .single();
-      
-      if (error && error.code !== 'PGRST116') {
+        .maybeSingle();
+
+      if (error) {
         console.error('Error fetching profile:', error);
-        return;
       }
-      
-      setProfile(data);
+
+      if (!data) {
+        const { data: created, error: insertError } = await supabase
+          .from('profiles')
+          .insert({ user_id: userId })
+          .select()
+          .single();
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+          setProfile(null);
+        } else {
+          setProfile(created);
+        }
+      } else {
+        setProfile(data);
+      }
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
@@ -135,28 +148,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return { error };
       }
 
-      // Create profile if user was created
-      if (data.user) {
-        const { error: profileError } = await supabase
+      // Create profile only if session exists (avoids RLS issues before email confirmation)
+      if (data.user && data.session) {
+        const { data: created, error: profileError } = await supabase
           .from('profiles')
           .insert({
             user_id: data.user.id,
             role,
             display_name: displayName || null
-          });
+          })
+          .select()
+          .single();
 
         if (profileError) {
           console.error('Error creating profile:', profileError);
         } else {
-          // Immediately set the profile in context after successful creation
-          setProfile({
-            id: '', // This will be set by the database
-            user_id: data.user.id,
-            role,
-            display_name: displayName || null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
+          setProfile(created);
         }
       }
       
