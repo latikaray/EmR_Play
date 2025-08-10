@@ -16,6 +16,7 @@ import BreathingPage from "./pages/BreathingPage";
 import GratitudeJournalPage from "./pages/GratitudeJournalPage";
 import EmojiMatchPage from "./pages/EmojiMatchPage";
 import EmotionWheelPage from "./pages/EmotionWheelPage";
+import DrawMoodPage from "./pages/DrawMoodPage";
 import ParentHomePage from "./pages/ParentHomePage";
 import ParentRolePlayPage from "./pages/ParentRolePlayPage";
 import ParentQuizzesPage from "./pages/ParentQuizzesPage";
@@ -48,6 +49,7 @@ const AppRouter = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/activities" element={user && profile?.role === 'child' ? <ActivitiesPage /> : !user ? <ActivitiesPage /> : <Navigate to="/login" replace />} />
         <Route path="/activities/story" element={user && profile?.role === 'child' ? <StoryPage /> : !user ? <StoryPage /> : <Navigate to="/login" replace />} />
+        <Route path="/activities/draw" element={user && profile?.role === 'child' ? <DrawMoodPage /> : !user ? <DrawMoodPage /> : <Navigate to="/login" replace />} />
         <Route path="/activities/breathing" element={user && profile?.role === 'child' ? <BreathingPage /> : !user ? <BreathingPage /> : <Navigate to="/login" replace />} />
         <Route path="/activities/gratitude" element={user && profile?.role === 'child' ? <GratitudeJournalPage /> : !user ? <GratitudeJournalPage /> : <Navigate to="/login" replace />} />
         <Route path="/activities/emoji-match" element={user && profile?.role === 'child' ? <EmojiMatchPage /> : !user ? <EmojiMatchPage /> : <Navigate to="/login" replace />} />
