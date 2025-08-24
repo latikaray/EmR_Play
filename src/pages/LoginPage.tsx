@@ -3,10 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sparkles, Heart, Star, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth, UserRole } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,9 +14,7 @@ const LoginPage = () => {
     password: ""
   });
   const [loading, setLoading] = useState(false);
-  const [demoRole, setDemoRole] = useState<UserRole>("child");
   const { signIn } = useAuth();
-  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,14 +25,6 @@ const LoginPage = () => {
     // No manual navigation needed here
     
     setLoading(false);
-  };
-
-  const handleDemoMode = () => {
-    if (demoRole === "parent") {
-      navigate("/parent");
-    } else {
-      navigate("/child");
-    }
   };
 
   return (
@@ -137,39 +126,6 @@ const LoginPage = () => {
           </CardContent>
         </Card>
 
-        {/* Demo Mode */}
-        <Card className="shadow-card bg-card/50 backdrop-blur border border-accent/30">
-          <CardContent className="p-4 text-center space-y-4">
-            <p className="text-sm text-muted-foreground font-comic">
-              Want to try EMR Play first?
-            </p>
-            <div className="space-y-2">
-              <Label className="font-comic text-foreground text-sm">
-                Try as
-              </Label>
-              <Select value={demoRole} onValueChange={(value: UserRole) => setDemoRole(value)}>
-                <SelectTrigger className="font-comic">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="child" className="font-comic">
-                    🧒 Child
-                  </SelectItem>
-                  <SelectItem value="parent" className="font-comic">
-                    👨‍👩‍👧‍👦 Parent
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button 
-              variant="outline" 
-              onClick={handleDemoMode}
-              className="w-full font-comic"
-            >
-              Try Demo Mode
-            </Button>
-          </CardContent>
-        </Card>
 
         {/* Sign Up Link */}
         <div className="text-center">
