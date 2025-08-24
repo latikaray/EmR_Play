@@ -190,8 +190,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const deleteAccount = async () => {
     try {
-      // For now, just sign out the user
-      // In a real app, you would need to create a database function to delete user data
+      // First delete all user data using the database function
+      const { error: deleteError } = await supabase.rpc('delete_user_account');
+      
+      if (deleteError) {
+        console.error('Error deleting user data:', deleteError);
+        toast({
+          title: "Error",
+          description: "Failed to delete account data. Please try again.",
+          variant: "destructive",
+        });
+        return { error: deleteError };
+      }
+      
+      // Then sign out the user
       await signOut();
       
       toast({
@@ -201,6 +213,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       return { error: null };
     } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete account. Please try again.",
+        variant: "destructive",
+      });
       return { error };
     }
   };
