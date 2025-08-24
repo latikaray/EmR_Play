@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
+import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/HomePage";
 import ActivitiesPage from "./pages/ActivitiesPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -41,12 +42,16 @@ const AppRouter = () => {
     <Layout>
       <Routes>
         {/* Public routes */}
-        <Route path="/login" element={!user ? <LoginPage /> : <Navigate to={profile?.role === 'parent' ? '/parent' : '/'} replace />} />
-        <Route path="/signup" element={!user ? <SignUpPage /> : <Navigate to={profile?.role === 'parent' ? '/parent' : '/'} replace />} />
+        <Route path="/welcome" element={<LandingPage />} />
+        <Route path="/login" element={!user ? <LoginPage /> : <Navigate to={profile?.role === 'parent' ? '/parent' : '/child'} replace />} />
+        <Route path="/signup" element={!user ? <SignUpPage /> : <Navigate to={profile?.role === 'parent' ? '/parent' : '/child'} replace />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        
+        {/* Role-based home routes */}
+        <Route path="/" element={!user ? <LandingPage /> : <Navigate to={profile?.role === 'parent' ? '/parent' : '/child'} replace />} />
+        <Route path="/child" element={<HomePage />} />
         {/* Protected routes - Child */}
-        <Route path="/" element={<HomePage />} />
         <Route path="/activities" element={user && profile?.role === 'child' ? <ActivitiesPage /> : !user ? <ActivitiesPage /> : <Navigate to="/login" replace />} />
         <Route path="/activities/story" element={user && profile?.role === 'child' ? <StoryPage /> : !user ? <StoryPage /> : <Navigate to="/login" replace />} />
         <Route path="/activities/draw" element={user && profile?.role === 'child' ? <DrawMoodPage /> : !user ? <DrawMoodPage /> : <Navigate to="/login" replace />} />

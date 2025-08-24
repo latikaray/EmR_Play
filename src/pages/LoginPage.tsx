@@ -34,7 +34,7 @@ const LoginPage = () => {
     if (demoRole === "parent") {
       navigate("/parent");
     } else {
-      navigate("/");
+      navigate("/child");
     }
   };
 
