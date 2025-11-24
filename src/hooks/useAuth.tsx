@@ -21,7 +21,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: any }>;
-  signUp: (email: string, password: string, role: UserRole, displayName?: string) => Promise<{ error?: any }>;
+  signUp: (email: string, password: string, role: UserRole, displayName?: string, otpEmail?: string) => Promise<{ error?: any }>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<{ error?: any }>;
 }
@@ -128,15 +128,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const signUp = async (email: string, password: string, role: UserRole, displayName?: string) => {
+  const signUp = async (email: string, password: string, role: UserRole, displayName?: string, otpEmail?: string) => {
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      // Use OTP-based signup - send OTP to specified email (parent's email for child accounts)
+      const emailForOTP = otpEmail || email;
       
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+      const { data, error } = await supabase.auth.signInWithOtp({
+        email: emailForOTP,
         options: {
-          emailRedirectTo: redirectUrl
+          shouldCreateUser: true,
+          data: {
+            user_email: email,
+            password: password,
+            role: role,
+            display_name: displayName || null
+          }
         }
       });
       
@@ -148,33 +154,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
         return { error };
       }
-
-      // Create profile only if session exists (avoids RLS issues before email confirmation)
-      if (data.user && data.session) {
-        const { data: created, error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            user_id: data.user.id,
-            role,
-            display_name: displayName || null
-          })
-          .select()
-          .single();
-
-        if (profileError) {
-          console.error('Error creating profile:', profileError);
-        } else {
-          setProfile(created);
-        }
-      }
       
       toast({
-        title: "Welcome to EMR Play! 🌟",
-        description: "Check your email to confirm your account.",
+        title: "Verification Code Sent! 📧",
+        description: `Check ${emailForOTP} for your 6-digit code.`,
       });
       
       return { error: null };
     } catch (error) {
+      toast({
+        title: "Sign Up Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
       return { error };
     }
   };
