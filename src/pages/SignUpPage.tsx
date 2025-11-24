@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sparkles, Heart, Star, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, UserRole } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +15,7 @@ const SignUpPage = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    parentEmail: "",
     password: "",
     confirmPassword: "",
     role: "child" as UserRole
@@ -27,14 +29,33 @@ const SignUpPage = () => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords don't match!");
+      return;
+    }
+
+    // For child accounts, parent email is required
+    if (formData.role === "child" && !formData.parentEmail) {
+      toast.error("Parent's email is required for child accounts");
       return;
     }
     
     setLoading(true);
-    const { error } = await signUp(formData.email, formData.password, formData.role, formData.name);
     
-    // Let the App.tsx routing handle navigation based on role
-    // No manual navigation needed here
+    // Use parent's email for child accounts, user's email for parent accounts
+    const emailToVerify = formData.role === "child" ? formData.parentEmail : formData.email;
+    
+    const { error } = await signUp(
+      formData.email, 
+      formData.password, 
+      formData.role, 
+      formData.name,
+      emailToVerify
+    );
+    
+    if (!error) {
+      // Navigate to OTP verification page
+      navigate(`/verify-otp?email=${encodeURIComponent(emailToVerify)}&role=${formData.role}&name=${encodeURIComponent(formData.name)}`);
+    }
     
     setLoading(false);
   };
@@ -79,8 +100,27 @@ const SignUpPage = () => {
           <CardContent>
             <form onSubmit={handleSignUp} className="space-y-4">
               <div className="space-y-2">
+                <Label htmlFor="role" className="font-comic text-foreground">
+                  I am signing up as
+                </Label>
+                <Select value={formData.role} onValueChange={(value: UserRole) => setFormData({...formData, role: value})}>
+                  <SelectTrigger className="font-comic">
+                    <SelectValue placeholder="Choose your role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="child" className="font-comic">
+                      🧒 Child - Let's learn about emotions!
+                    </SelectItem>
+                    <SelectItem value="parent" className="font-comic">
+                      👨‍👩‍👧‍👦 Parent - Help my child grow emotionally
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="email" className="font-comic text-foreground">
-                  Email Address
+                  {formData.role === "child" ? "Child's Email Address" : "Email Address"}
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -95,6 +135,29 @@ const SignUpPage = () => {
                   />
                 </div>
               </div>
+
+              {formData.role === "child" && (
+                <div className="space-y-2">
+                  <Label htmlFor="parentEmail" className="font-comic text-foreground">
+                    Parent's Email Address <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="parentEmail"
+                      type="email"
+                      placeholder="parent@email.com"
+                      value={formData.parentEmail}
+                      onChange={(e) => setFormData({...formData, parentEmail: e.target.value})}
+                      className="pl-10 font-comic"
+                      required
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground font-comic">
+                    The verification code will be sent to parent's email
+                  </p>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="font-comic text-foreground">
@@ -153,33 +216,14 @@ const SignUpPage = () => {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="role" className="font-comic text-foreground">
-                  I am signing up as
-                </Label>
-                <Select value={formData.role} onValueChange={(value: UserRole) => setFormData({...formData, role: value})}>
-                  <SelectTrigger className="font-comic">
-                    <SelectValue placeholder="Choose your role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="child" className="font-comic">
-                      🧒 Child - Let's learn about emotions!
-                    </SelectItem>
-                    <SelectItem value="parent" className="font-comic">
-                      👨‍👩‍👧‍👦 Parent - Help my child grow emotionally
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               <Button 
                 type="submit" 
                 variant="fun" 
                 size="lg" 
                 className="w-full"
-                disabled={loading || formData.password !== formData.confirmPassword}
+                disabled={loading || formData.password !== formData.confirmPassword || (formData.role === "child" && !formData.parentEmail)}
               >
-                {loading ? "Creating Account..." : "Create Account & Start Playing! 🚀"}
+                {loading ? "Sending Verification Code..." : "Continue to Verification 🚀"}
               </Button>
             </form>
           </CardContent>

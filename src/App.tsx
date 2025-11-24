@@ -12,6 +12,7 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import VerifyOTPPage from "./pages/VerifyOTPPage";
 import StoryPage from "./pages/StoryPage";
 import BreathingPage from "./pages/BreathingPage";
 import GratitudeJournalPage from "./pages/GratitudeJournalPage";
@@ -45,6 +46,7 @@ const AppRouter = () => {
         <Route path="/welcome" element={<LandingPage />} />
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to={profile?.role === 'parent' ? '/parent' : '/child'} replace />} />
         <Route path="/signup" element={!user ? <SignUpPage /> : <Navigate to={profile?.role === 'parent' ? '/parent' : '/child'} replace />} />
+        <Route path="/verify-otp" element={<VerifyOTPPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         
