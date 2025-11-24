@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Star, Sun, Cloud } from 'lucide-react';
+import { ArrowLeft, Heart, Star, Sun, Cloud, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const GratitudeJournalPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [entries, setEntries] = useState({
     gratefulFor: '',
     goodDeeds: '',
@@ -14,6 +20,9 @@ const GratitudeJournalPage = () => {
     feelings: '',
     tomorrow: ''
   });
+  const [pastEntries, setPastEntries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [viewPastOpen, setViewPastOpen] = useState(false);
 
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -22,14 +31,67 @@ const GratitudeJournalPage = () => {
     day: 'numeric'
   });
 
+  useEffect(() => {
+    fetchPastEntries();
+  }, [user]);
+
+  const fetchPastEntries = async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('date', { ascending: false })
+      .limit(10);
+
+    if (error) {
+      console.error('Error fetching past entries:', error);
+    } else {
+      setPastEntries(data || []);
+    }
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setEntries(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSaveEntry = () => {
-    // Here you would save to Supabase
-    console.log('Saving journal entry:', entries);
-    // Show success message
+  const handleSaveEntry = async () => {
+    if (!user) {
+      toast.error('Please log in to save your journal entry');
+      return;
+    }
+
+    setLoading(true);
+
+    const content = JSON.stringify(entries);
+    const title = `Gratitude Journal - ${today}`;
+
+    const { error } = await supabase
+      .from('journal_entries')
+      .insert({
+        user_id: user.id,
+        title,
+        content,
+        date: new Date().toISOString().split('T')[0]
+      });
+
+    setLoading(false);
+
+    if (error) {
+      toast.error('Failed to save journal entry');
+      console.error('Error saving entry:', error);
+    } else {
+      toast.success('Journal entry saved! 💖');
+      setEntries({
+        gratefulFor: '',
+        goodDeeds: '',
+        challenges: '',
+        feelings: '',
+        tomorrow: ''
+      });
+      fetchPastEntries();
+    }
   };
 
   return (
@@ -163,18 +225,125 @@ const GratitudeJournalPage = () => {
           </CardContent>
         </Card>
 
-        {/* Save Button */}
-        <div className="mt-8 text-center">
+        {/* Action Buttons */}
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Button
             onClick={handleSaveEntry}
+            disabled={loading}
             className="bg-gradient-to-r from-primary to-primary-glow text-white px-8 py-3 text-lg font-bold hover:scale-105 transition-transform shadow-lg font-comic"
           >
-            Save My Journal Entry 📝
+            {loading ? 'Saving...' : 'Save My Journal Entry 📝'}
           </Button>
-          <p className="text-sm text-muted-foreground mt-2">
-            Your thoughts are precious and will be saved safely! 💖
-          </p>
+
+          <Dialog open={viewPastOpen} onOpenChange={setViewPastOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                className="px-8 py-3 text-lg font-bold font-comic"
+              >
+                <BookOpen className="h-5 w-5 mr-2" />
+                View Past Entries
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl max-h-[80vh]">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-comic text-primary">
+                  My Past Journal Entries 📖
+                </DialogTitle>
+              </DialogHeader>
+              <ScrollArea className="h-[60vh] pr-4">
+                {pastEntries.length === 0 ? (
+                  <p className="text-center text-muted-foreground font-comic py-8">
+                    No past entries yet. Start writing today! ✨
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {pastEntries.map((entry) => {
+                      const parsedContent = JSON.parse(entry.content);
+                      const entryDate = new Date(entry.date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      });
+
+                      return (
+                        <Card key={entry.id} className="border-2 border-primary/20">
+                          <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
+                            <CardTitle className="text-lg font-comic text-primary">
+                              {entryDate}
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="p-4 space-y-3">
+                            {parsedContent.gratefulFor && (
+                              <div>
+                                <p className="font-bold text-green-700 font-comic flex items-center gap-2">
+                                  <Heart className="h-4 w-4 text-red-500" />
+                                  Grateful for:
+                                </p>
+                                <p className="text-sm text-muted-foreground font-comic ml-6">
+                                  {parsedContent.gratefulFor}
+                                </p>
+                              </div>
+                            )}
+                            {parsedContent.goodDeeds && (
+                              <div>
+                                <p className="font-bold text-blue-700 font-comic flex items-center gap-2">
+                                  <Star className="h-4 w-4 text-yellow-500" />
+                                  Good Deeds:
+                                </p>
+                                <p className="text-sm text-muted-foreground font-comic ml-6">
+                                  {parsedContent.goodDeeds}
+                                </p>
+                              </div>
+                            )}
+                            {parsedContent.challenges && (
+                              <div>
+                                <p className="font-bold text-orange-700 font-comic flex items-center gap-2">
+                                  <Cloud className="h-4 w-4 text-gray-500" />
+                                  Challenges:
+                                </p>
+                                <p className="text-sm text-muted-foreground font-comic ml-6">
+                                  {parsedContent.challenges}
+                                </p>
+                              </div>
+                            )}
+                            {parsedContent.feelings && (
+                              <div>
+                                <p className="font-bold text-purple-700 font-comic flex items-center gap-2">
+                                  <Heart className="h-4 w-4 text-pink-500" />
+                                  Feelings:
+                                </p>
+                                <p className="text-sm text-muted-foreground font-comic ml-6">
+                                  {parsedContent.feelings}
+                                </p>
+                              </div>
+                            )}
+                            {parsedContent.tomorrow && (
+                              <div>
+                                <p className="font-bold text-pink-700 font-comic flex items-center gap-2">
+                                  <Sun className="h-4 w-4 text-yellow-500" />
+                                  Excited about:
+                                </p>
+                                <p className="text-sm text-muted-foreground font-comic ml-6">
+                                  {parsedContent.tomorrow}
+                                </p>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
+              </ScrollArea>
+            </DialogContent>
+          </Dialog>
         </div>
+
+        <p className="text-sm text-muted-foreground mt-4 text-center">
+          Your thoughts are precious and will be saved safely! 💖
+        </p>
       </div>
     </div>
   );

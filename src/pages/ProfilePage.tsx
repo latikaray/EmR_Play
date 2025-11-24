@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -38,12 +38,17 @@ const ProfilePage = () => {
   const { user, signOut, deleteAccount, profile } = useAuth();
   const navigate = useNavigate();
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (profile?.display_name) {
       setProfileData((p) => ({ ...p, name: profile.display_name || "" }));
     }
-  }, [profile?.display_name]);
+    if (profile?.avatar_url) {
+      setProfileData((p) => ({ ...p, avatar: profile.avatar_url || "" }));
+    }
+  }, [profile?.display_name, profile?.avatar_url]);
 
   const achievements = [
     { name: "First Drawing", icon: "🎨", date: "2024-01-15", description: "Completed your first mood drawing!" },
@@ -67,6 +72,52 @@ const ProfilePage = () => {
     { label: "Badges Earned", value: "5", icon: Award, color: "text-fun-yellow" },
     { label: "Mood Score", value: "8.5", icon: Star, color: "text-secondary" },
   ];
+
+  const handleAvatarClick = () => {
+    if (isEditing && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploading(true);
+
+    try {
+      // Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      // Update profile with avatar URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      setProfileData((p) => ({ ...p, avatar: publicUrl }));
+      toast.success("Profile picture updated! 📸");
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast.error("Failed to upload profile picture");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSave = async () => {
     setIsEditing(false);
@@ -129,17 +180,29 @@ const ProfilePage = () => {
               <Avatar className="w-24 h-24 border-4 border-primary shadow-fun">
                 <AvatarImage src={profileData.avatar} />
                 <AvatarFallback className="bg-gradient-primary text-primary-foreground text-2xl font-comic">
-                  {profileData.name.charAt(0)}
+                  {profileData.name.charAt(0) || 'U'}
                 </AvatarFallback>
               </Avatar>
               {isEditing && (
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="absolute -bottom-2 -right-2 rounded-full h-8 w-8"
-                >
-                  <Camera className="h-4 w-4" />
-                </Button>
+                <>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    onClick={handleAvatarClick}
+                    disabled={uploading}
+                    className="absolute -bottom-2 -right-2 rounded-full h-8 w-8"
+                  >
+                    <Camera className="h-4 w-4" />
+                  </Button>
+                </>
               )}
             </div>
 
