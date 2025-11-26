@@ -130,16 +130,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signUp = async (email: string, password: string, role: UserRole, displayName?: string, otpEmail?: string) => {
     try {
-      // Use OTP-based signup - send OTP to specified email (parent's email for child accounts)
+      // For child accounts, use parent's email; for parent accounts, use their own email
       const emailForOTP = otpEmail || email;
       
-      const { data, error } = await supabase.auth.signInWithOtp({
+      // Use signUp with email confirmation to get OTP code
+      const { data, error } = await supabase.auth.signUp({
         email: emailForOTP,
+        password: password,
         options: {
-          shouldCreateUser: true,
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
-            user_email: email,
-            password: password,
+            actual_email: email, // Store actual user email in metadata
             role: role,
             display_name: displayName || null
           }
