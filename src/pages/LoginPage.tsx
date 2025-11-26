@@ -3,15 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sparkles, Heart, Star, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, UserRole } from "@/hooks/useAuth";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
+    role: "child" as UserRole
   });
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
@@ -65,6 +67,25 @@ const LoginPage = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="role" className="font-comic text-foreground">
+                  I am signing in as
+                </Label>
+                <Select value={formData.role} onValueChange={(value: UserRole) => setFormData({...formData, role: value})}>
+                  <SelectTrigger className="font-comic">
+                    <SelectValue placeholder="Choose your role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="child" className="font-comic">
+                      🧒 Child
+                    </SelectItem>
+                    <SelectItem value="parent" className="font-comic">
+                      👨‍👩‍👧‍👦 Parent
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email" className="font-comic text-foreground">
                   Email Address
