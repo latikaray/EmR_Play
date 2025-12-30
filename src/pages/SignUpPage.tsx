@@ -3,10 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, Heart, Star, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { Sparkles, Heart, Star, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth, UserRole } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 const SignUpPage = () => {
@@ -18,7 +17,6 @@ const SignUpPage = () => {
     parentEmail: "",
     password: "",
     confirmPassword: "",
-    role: "child" as UserRole
   });
   
   const [loading, setLoading] = useState(false);
@@ -33,28 +31,28 @@ const SignUpPage = () => {
       return;
     }
 
-    // For child accounts, parent email is required
-    if (formData.role === "child" && !formData.parentEmail) {
-      toast.error("Parent's email is required for child accounts");
+    // Parent email is required for child accounts
+    if (!formData.parentEmail) {
+      toast.error("Parent's email is required");
       return;
     }
     
     setLoading(true);
     
-    // Use parent's email for child accounts, user's email for parent accounts
-    const emailToVerify = formData.role === "child" ? formData.parentEmail : formData.email;
+    // Use parent's email for verification
+    const emailToVerify = formData.parentEmail;
     
     const { error } = await signUp(
       formData.email, 
       formData.password, 
-      formData.role, 
+      'child', 
       formData.name,
       emailToVerify
     );
     
     if (!error) {
       // Navigate to OTP verification page
-      navigate(`/verify-otp?email=${encodeURIComponent(emailToVerify)}&role=${formData.role}&name=${encodeURIComponent(formData.name)}`);
+      navigate(`/verify-otp?email=${encodeURIComponent(emailToVerify)}&role=child&name=${encodeURIComponent(formData.name)}`);
     }
     
     setLoading(false);
@@ -100,34 +98,15 @@ const SignUpPage = () => {
           <CardContent>
             <form onSubmit={handleSignUp} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="role" className="font-comic text-foreground">
-                  I am signing up as
-                </Label>
-                <Select value={formData.role} onValueChange={(value: UserRole) => setFormData({...formData, role: value})}>
-                  <SelectTrigger className="font-comic">
-                    <SelectValue placeholder="Choose your role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="child" className="font-comic">
-                      🧒 Child - Let's learn about emotions!
-                    </SelectItem>
-                    <SelectItem value="parent" className="font-comic">
-                      👨‍👩‍👧‍👦 Parent - Help my child grow emotionally
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="email" className="font-comic text-foreground">
-                  {formData.role === "child" ? "Child's Email Address" : "Email Address"}
+                  Child's Email Address
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
-                    placeholder="your@email.com"
+                    placeholder="child@email.com"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                     className="pl-10 font-comic"
@@ -136,28 +115,26 @@ const SignUpPage = () => {
                 </div>
               </div>
 
-              {formData.role === "child" && (
-                <div className="space-y-2">
-                  <Label htmlFor="parentEmail" className="font-comic text-foreground">
-                    Parent's Email Address <span className="text-destructive">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="parentEmail"
-                      type="email"
-                      placeholder="parent@email.com"
-                      value={formData.parentEmail}
-                      onChange={(e) => setFormData({...formData, parentEmail: e.target.value})}
-                      className="pl-10 font-comic"
-                      required
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground font-comic">
-                    The verification code will be sent to parent's email
-                  </p>
+              <div className="space-y-2">
+                <Label htmlFor="parentEmail" className="font-comic text-foreground">
+                  Parent's Email Address <span className="text-destructive">*</span>
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="parentEmail"
+                    type="email"
+                    placeholder="parent@email.com"
+                    value={formData.parentEmail}
+                    onChange={(e) => setFormData({...formData, parentEmail: e.target.value})}
+                    className="pl-10 font-comic"
+                    required
+                  />
                 </div>
-              )}
+                <p className="text-xs text-muted-foreground font-comic">
+                  The verification code will be sent to parent's email
+                </p>
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="font-comic text-foreground">
@@ -221,7 +198,7 @@ const SignUpPage = () => {
                 variant="fun" 
                 size="lg" 
                 className="w-full"
-                disabled={loading || formData.password !== formData.confirmPassword || (formData.role === "child" && !formData.parentEmail)}
+                disabled={loading || formData.password !== formData.confirmPassword || !formData.parentEmail}
               >
                 {loading ? "Sending Verification Code..." : "Continue to Verification 🚀"}
               </Button>
