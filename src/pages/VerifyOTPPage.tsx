@@ -55,8 +55,8 @@ const VerifyOTPPage = () => {
           toast.success("Account verified successfully! 🎉");
         }
 
-        // Navigate based on intended role
-        navigate(role === 'parent' ? '/parent' : '/child');
+        // Navigate to child home
+        navigate('/child');
       }
     } catch (error) {
       toast.error("Verification failed. Please try again.");
