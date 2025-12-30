@@ -36,14 +36,14 @@ const VerifyOTPPage = () => {
       if (error) {
         toast.error(error.message);
       } else if (data.user) {
-        // Create profile after successful verification
+        // Create or update profile after successful verification
         const { error: profileError } = await supabase
           .from('profiles')
-          .insert({
+          .upsert({
             user_id: data.user.id,
             role: role as 'child' | 'parent',
             display_name: displayName || null
-          });
+          }, { onConflict: 'user_id' });
 
         if (profileError) {
           console.error('Error creating profile:', profileError);
