@@ -45,25 +45,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) {
         console.error('Error fetching profile:', error);
+        setProfile(null);
+        return;
       }
 
-      if (!data) {
-        const { data: created, error: insertError } = await supabase
-          .from('profiles')
-          .insert({ user_id: userId })
-          .select()
-          .single();
-        if (insertError) {
-          console.error('Error creating profile:', insertError);
-          setProfile(null);
-        } else {
-          setProfile(created);
-        }
-      } else {
-        setProfile(data);
-      }
+      // Don't auto-create profile here - let VerifyOTPPage create it with correct role
+      // This prevents race condition where profile gets created with default 'child' role
+      setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
+      setProfile(null);
     }
   };
 

@@ -36,6 +36,9 @@ const VerifyOTPPage = () => {
       if (error) {
         toast.error(error.message);
       } else if (data.user) {
+        // Small delay to ensure auth.users entry is fully committed
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         // Create or update profile after successful verification
         const { error: profileError } = await supabase
           .from('profiles')
@@ -47,9 +50,12 @@ const VerifyOTPPage = () => {
 
         if (profileError) {
           console.error('Error creating profile:', profileError);
+          toast.error("Failed to create profile. Please try logging in.");
+        } else {
+          toast.success("Account verified successfully! 🎉");
         }
 
-        toast.success("Account verified successfully! 🎉");
+        // Navigate based on intended role
         navigate(role === 'parent' ? '/parent' : '/child');
       }
     } catch (error) {
