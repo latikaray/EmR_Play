@@ -107,6 +107,36 @@ export type Database = {
         }
         Relationships: []
       }
+      parent_child_links: {
+        Row: {
+          child_user_id: string | null
+          created_at: string
+          id: string
+          link_code: string
+          linked_at: string | null
+          parent_user_id: string
+          status: string
+        }
+        Insert: {
+          child_user_id?: string | null
+          created_at?: string
+          id?: string
+          link_code: string
+          linked_at?: string | null
+          parent_user_id: string
+          status?: string
+        }
+        Update: {
+          child_user_id?: string | null
+          created_at?: string
+          id?: string
+          link_code?: string
+          linked_at?: string | null
+          parent_user_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, BookOpen, MessageSquare, Gamepad2, FileText, Users, Brain, Coffee } from "lucide-react";
+import { Heart, BookOpen, MessageSquare, Gamepad2, FileText, Users, Brain, Coffee, Link2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import LinkChildAccount from "@/components/LinkChildAccount";
 
 const ParentHomePage = () => {
   const [completedActivities] = useState([
@@ -115,6 +116,9 @@ const ParentHomePage = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Link Child Account */}
+        <LinkChildAccount />
 
         {/* Main Activities Grid */}
         <div className="mb-8">

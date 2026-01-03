@@ -26,6 +26,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import EnterLinkCode from "@/components/EnterLinkCode";
 
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -364,6 +365,11 @@ const ProfilePage = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Link to Parent (only for children) */}
+        {profile?.role === 'child' && (
+          <EnterLinkCode />
+        )}
 
         {/* Account Actions */}
         {user && (
