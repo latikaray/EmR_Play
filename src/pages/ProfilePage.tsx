@@ -36,7 +36,7 @@ const ProfilePage = () => {
     favoriteColor: "Rainbow",
     avatar: ""
   });
-  const { user, signOut, deleteAccount, profile } = useAuth();
+  const { user, signOut, deleteAccount, profile, role } = useAuth();
   const navigate = useNavigate();
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -102,9 +102,10 @@ const ProfilePage = () => {
         .from('avatars')
         .getPublicUrl(fileName);
 
-      // Update profile with avatar URL
+      // Update profile with avatar URL in the appropriate table
+      const profileTable = role === 'parent' ? 'parent_profiles' : 'child_profiles';
       const { error: updateError } = await supabase
-        .from('profiles')
+        .from(profileTable)
         .update({ avatar_url: publicUrl })
         .eq('user_id', user.id);
 
@@ -123,8 +124,9 @@ const ProfilePage = () => {
   const handleSave = async () => {
     setIsEditing(false);
     if (!user) return;
+    const profileTable = role === 'parent' ? 'parent_profiles' : 'child_profiles';
     const { error } = await supabase
-      .from('profiles')
+      .from(profileTable)
       .update({ display_name: profileData.name })
       .eq('user_id', user.id);
     if (error) {
@@ -136,7 +138,7 @@ const ProfilePage = () => {
 
   const handleLogout = async () => {
     await signOut();
-    navigate('/login');
+    navigate('/welcome');
   };
 
   const handleDeleteAccount = async () => {
@@ -144,7 +146,7 @@ const ProfilePage = () => {
     const { error } = await deleteAccount();
     
     if (!error) {
-      navigate('/signup');
+      navigate('/welcome');
     }
     
     setDeleteLoading(false);
@@ -367,7 +369,7 @@ const ProfilePage = () => {
         </Card>
 
         {/* Link to Parent (only for children) */}
-        {profile?.role === 'child' && (
+        {role === 'child' && (
           <EnterLinkCode />
         )}
 

@@ -8,7 +8,6 @@ export type UserRole = 'child' | 'parent';
 export interface UserProfile {
   id: string;
   user_id: string;
-  role: UserRole;
   display_name: string | null;
   avatar_url: string | null;
   created_at: string;
@@ -19,11 +18,13 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: UserProfile | null;
+  role: UserRole | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error?: any }>;
+  signIn: (email: string, password: string, expectedRole: UserRole) => Promise<{ error?: any }>;
   signUp: (email: string, password: string, role: UserRole, displayName?: string, otpEmail?: string) => Promise<{ error?: any }>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<{ error?: any }>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,13 +33,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const fetchUserProfile = async (userId: string) => {
+  const fetchUserRole = async (userId: string): Promise<UserRole | null> => {
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching role:', error);
+        return null;
+      }
+
+      return data?.role as UserRole | null;
+    } catch (error) {
+      console.error('Error fetching role:', error);
+      return null;
+    }
+  };
+
+  const fetchUserProfile = async (userId: string, userRole: UserRole | null) => {
+    try {
+      if (!userRole) {
+        setProfile(null);
+        return;
+      }
+
+      const tableName = userRole === 'parent' ? 'parent_profiles' : 'child_profiles';
+      
+      const { data, error } = await supabase
+        .from(tableName)
         .select('*')
         .eq('user_id', userId)
         .maybeSingle();
@@ -49,12 +78,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
-      // Don't auto-create profile here - let VerifyOTPPage create it with correct role
-      // This prevents race condition where profile gets created with default 'child' role
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
       setProfile(null);
+    }
+  };
+
+  const refreshProfile = async () => {
+    if (user) {
+      const userRole = await fetchUserRole(user.id);
+      setRole(userRole);
+      await fetchUserProfile(user.id, userRole);
     }
   };
 
@@ -66,12 +101,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile after setting user
-          setTimeout(() => {
-            fetchUserProfile(session.user.id);
+          // Fetch user role and profile after setting user
+          setTimeout(async () => {
+            const userRole = await fetchUserRole(session.user.id);
+            setRole(userRole);
+            await fetchUserProfile(session.user.id, userRole);
           }, 0);
         } else {
           setProfile(null);
+          setRole(null);
         }
         
         setLoading(false);
@@ -79,12 +117,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchUserProfile(session.user.id);
+        const userRole = await fetchUserRole(session.user.id);
+        setRole(userRole);
+        await fetchUserProfile(session.user.id, userRole);
       }
       
       setLoading(false);
@@ -93,9 +133,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, expectedRole: UserRole) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -106,14 +146,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           description: error.message,
           variant: "destructive",
         });
-      } else {
+        return { error };
+      }
+
+      // Check if user has the expected role
+      if (data.user) {
+        const userRole = await fetchUserRole(data.user.id);
+        
+        if (userRole !== expectedRole) {
+          // Sign out the user - wrong login page
+          await supabase.auth.signOut();
+          toast({
+            title: "Wrong Account Type",
+            description: `This is a ${userRole} account. Please use the ${userRole} login page.`,
+            variant: "destructive",
+          });
+          return { error: { message: 'Wrong account type' } };
+        }
+
+        setRole(userRole);
+        await fetchUserProfile(data.user.id, userRole);
+        
         toast({
           title: "Welcome back! 🎉",
           description: "Successfully signed in!",
         });
       }
       
-      return { error };
+      return { error: null };
     } catch (error) {
       return { error };
     }
@@ -166,6 +226,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
+      setProfile(null);
+      setRole(null);
       toast({
         title: "See you later! 👋",
         description: "Successfully signed out.",
@@ -211,11 +273,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     user,
     session,
     profile,
+    role,
     loading,
     signIn,
     signUp,
     signOut,
     deleteAccount,
+    refreshProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

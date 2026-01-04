@@ -62,12 +62,12 @@ const LandingPage = () => {
                 </div>
               </div>
               <div className="space-y-3 pt-4">
-                <Link to="/signup" className="w-full">
+                <Link to="/child/signup" className="w-full">
                   <Button variant="fun" size="lg" className="w-full text-lg">
                     Start Playing! 🚀
                   </Button>
                 </Link>
-                <Link to="/login" className="w-full">
+                <Link to="/child/login" className="w-full">
                   <Button variant="outline" size="lg" className="w-full font-comic">
                     I Already Have an Account
                   </Button>
@@ -105,12 +105,12 @@ const LandingPage = () => {
                 </div>
               </div>
               <div className="space-y-3 pt-4">
-                <Link to="/signup" className="w-full">
+                <Link to="/parent/signup" className="w-full">
                   <Button variant="fun" size="lg" className="w-full text-lg">
                     Join as Parent! 💪
                   </Button>
                 </Link>
-                <Link to="/login" className="w-full">
+                <Link to="/parent/login" className="w-full">
                   <Button variant="outline" size="lg" className="w-full font-comic">
                     I Already Have an Account
                   </Button>

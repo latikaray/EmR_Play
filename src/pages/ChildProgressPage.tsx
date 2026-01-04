@@ -27,7 +27,7 @@ const ChildProgressPage = () => {
   const [feedback, setFeedback] = useState("");
   const [savingMood, setSavingMood] = useState(false);
   
-  const { user, profile } = useAuth();
+  const { user, role } = useAuth();
   
   // Use custom hooks for real-time data
   const { 
@@ -90,7 +90,7 @@ const ChildProgressPage = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Link to={profile?.role === 'parent' ? '/parent' : '/'}>
+          <Link to={role === 'parent' ? '/parent' : '/'}>
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
@@ -98,7 +98,7 @@ const ChildProgressPage = () => {
           </Link>
           <div>
             <h1 className="text-4xl font-bold bg-gradient-fun bg-clip-text text-transparent font-comic">
-              {profile?.role === 'parent' ? "Track Your Child's Progress" : "Your Progress"}
+              {role === 'parent' ? "Track Your Child's Progress" : "Your Progress"}
             </h1>
             <p className="text-lg text-muted-foreground font-comic mt-2">
               Monitor emotional growth and activity completions
@@ -325,7 +325,7 @@ const ChildProgressPage = () => {
               </Card>
 
               {/* Feedback Section */}
-              {profile?.role === 'parent' && (
+              {role === 'parent' && (
                 <Card className="shadow-fun bg-card/80 backdrop-blur border-2 border-primary/20">
                   <CardHeader>
                     <CardTitle className="font-comic">Parent Feedback</CardTitle>

@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const NotFound = () => {
   const location = useLocation();
-  const { profile } = useAuth();
+  const { role } = useAuth();
 
   useEffect(() => {
     console.error(
@@ -17,9 +17,9 @@ const NotFound = () => {
   }, [location.pathname]);
 
   const getHomeRoute = () => {
-    if (profile?.role === 'parent') {
+    if (role === 'parent') {
       return '/parent';
-    } else if (profile?.role === 'child') {
+    } else if (role === 'child') {
       return '/child';
     }
     return '/';

@@ -25,11 +25,11 @@ export interface ActivityProgress {
 export const useActivityProgress = (childUserId?: string) => {
   const [activityCompletions, setActivityCompletions] = useState<ActivityCompletion[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user, profile } = useAuth();
+  const { user, role } = useAuth();
   const { toast } = useToast();
 
   const targetUserId = childUserId || user?.id;
-  const isParentViewing = profile?.role === 'parent' && childUserId;
+  const isParentViewing = role === 'parent' && childUserId;
 
   const fetchActivityCompletions = useCallback(async () => {
     if (!targetUserId) return;
@@ -75,7 +75,7 @@ export const useActivityProgress = (childUserId?: string) => {
     try {
       const completionData = {
         user_id: user.id,
-        child_user_id: profile?.role === 'parent' ? childUserId : null,
+        child_user_id: role === 'parent' ? childUserId : null,
         activity_name: activityName,
         activity_type: activityType,
         eq_trait: eqTrait || null,
@@ -107,7 +107,7 @@ export const useActivityProgress = (childUserId?: string) => {
       });
       return { error: "Failed to record completion" };
     }
-  }, [user, profile?.role, childUserId, toast, fetchActivityCompletions]);
+  }, [user, role, childUserId, toast, fetchActivityCompletions]);
 
   const getActivityProgress = useCallback((activityId: string): ActivityProgress => {
     const relevantCompletions = activityCompletions.filter(
