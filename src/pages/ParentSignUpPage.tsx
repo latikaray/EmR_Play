@@ -3,22 +3,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, Heart, Star, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { Sparkles, Heart, Star, Mail, Lock, Eye, EyeOff, Users } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth, UserRole } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
-const SignUpPage = () => {
+const ParentSignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    parentEmail: "",
     password: "",
     confirmPassword: "",
-    role: "child" as UserRole
   });
   
   const [loading, setLoading] = useState(false);
@@ -32,34 +29,22 @@ const SignUpPage = () => {
       toast.error("Passwords don't match!");
       return;
     }
-
-    // For child accounts, parent email is required
-    if (formData.role === "child" && !formData.parentEmail) {
-      toast.error("Parent's email is required for child accounts");
-      return;
-    }
     
     setLoading(true);
-    
-    // Use parent's email for child accounts, user's email for parent accounts
-    const emailToVerify = formData.role === "child" ? formData.parentEmail : formData.email;
     
     const { error } = await signUp(
       formData.email, 
       formData.password, 
-      formData.role, 
-      formData.name,
-      emailToVerify
+      'parent', 
+      formData.name
     );
     
     if (!error) {
-      // Navigate to OTP verification page
-      navigate(`/verify-otp?email=${encodeURIComponent(emailToVerify)}&role=${formData.role}&name=${encodeURIComponent(formData.name)}`);
+      navigate(`/verify-otp?email=${encodeURIComponent(formData.email)}&role=parent&name=${encodeURIComponent(formData.name)}`);
     }
     
     setLoading(false);
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-background flex items-center justify-center p-4">
@@ -76,14 +61,14 @@ const SignUpPage = () => {
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-2 mb-6">
             <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center shadow-fun animate-bounce-in">
-              <Heart className="h-6 w-6 text-primary-foreground" />
+              <Users className="h-6 w-6 text-primary-foreground" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-fun bg-clip-text text-transparent font-comic">
-              EMR Play
+              Parent Portal
             </h1>
           </div>
           <p className="text-lg text-muted-foreground font-comic">
-            Start your emotional adventure today! 🌟
+            Join EMR Play and guide your child's emotional growth! 🌟
           </p>
         </div>
 
@@ -91,36 +76,34 @@ const SignUpPage = () => {
         <Card className="shadow-fun bg-card/80 backdrop-blur border-2 border-primary/20 hover-lift">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-comic text-foreground">
-              Create Account
+              Create Parent Account
             </CardTitle>
             <CardDescription className="font-comic">
-              Join thousands of kids learning about emotions!
+              Help your child develop emotional intelligence
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignUp} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="role" className="font-comic text-foreground">
-                  I am signing up as
+                <Label htmlFor="name" className="font-comic text-foreground">
+                  Your Name (Optional)
                 </Label>
-                <Select value={formData.role} onValueChange={(value: UserRole) => setFormData({...formData, role: value})}>
-                  <SelectTrigger className="font-comic">
-                    <SelectValue placeholder="Choose your role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="child" className="font-comic">
-                      🧒 Child - Let's learn about emotions!
-                    </SelectItem>
-                    <SelectItem value="parent" className="font-comic">
-                      👨‍👩‍👧‍👦 Parent - Help my child grow emotionally
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="relative">
+                  <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Your name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    className="pl-10 font-comic"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="email" className="font-comic text-foreground">
-                  {formData.role === "child" ? "Child's Email Address" : "Email Address"}
+                  Email Address
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -135,29 +118,6 @@ const SignUpPage = () => {
                   />
                 </div>
               </div>
-
-              {formData.role === "child" && (
-                <div className="space-y-2">
-                  <Label htmlFor="parentEmail" className="font-comic text-foreground">
-                    Parent's Email Address <span className="text-destructive">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="parentEmail"
-                      type="email"
-                      placeholder="parent@email.com"
-                      value={formData.parentEmail}
-                      onChange={(e) => setFormData({...formData, parentEmail: e.target.value})}
-                      className="pl-10 font-comic"
-                      required
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground font-comic">
-                    The verification code will be sent to parent's email
-                  </p>
-                </div>
-              )}
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="font-comic text-foreground">
@@ -221,24 +181,36 @@ const SignUpPage = () => {
                 variant="fun" 
                 size="lg" 
                 className="w-full"
-                disabled={loading || formData.password !== formData.confirmPassword || (formData.role === "child" && !formData.parentEmail)}
+                disabled={loading || formData.password !== formData.confirmPassword}
               >
-                {loading ? "Sending Verification Code..." : "Continue to Verification 🚀"}
+                {loading ? "Sending Verification Code..." : "Create Account 🚀"}
               </Button>
             </form>
           </CardContent>
         </Card>
-
 
         {/* Sign In Link */}
         <div className="text-center">
           <p className="text-sm text-muted-foreground font-comic">
             Already have an account?{" "}
             <Link 
-              to="/login" 
+              to="/parent/login" 
               className="text-primary hover:underline font-bold"
             >
               Sign in here
+            </Link>
+          </p>
+        </div>
+
+        {/* Child Signup Link */}
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground font-comic">
+            Want to create a child account?{" "}
+            <Link 
+              to="/child/signup" 
+              className="text-primary hover:underline font-bold"
+            >
+              Child Sign Up
             </Link>
           </p>
         </div>
@@ -248,7 +220,7 @@ const SignUpPage = () => {
           <CardContent className="p-4 text-center">
             <h4 className="font-bold font-comic mb-2">🔒 Safe & Secure</h4>
             <p className="text-sm opacity-90 font-comic">
-              Your child's data is protected with enterprise-grade security. 
+              Your data is protected with enterprise-grade security. 
               We never share personal information.
             </p>
           </CardContent>
@@ -258,4 +230,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage;
+export default ParentSignUpPage;

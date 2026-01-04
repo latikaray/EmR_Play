@@ -39,12 +39,24 @@ const VerifyOTPPage = () => {
         // Small delay to ensure auth.users entry is fully committed
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        // Create or update profile after successful verification
-        const { error: profileError } = await supabase
-          .from('profiles')
+        // Create user role entry first
+        const { error: roleError } = await supabase
+          .from('user_roles')
           .upsert({
             user_id: data.user.id,
-            role: role as 'child' | 'parent',
+            role: role as 'child' | 'parent'
+          }, { onConflict: 'user_id,role' });
+
+        if (roleError) {
+          console.error('Error creating user role:', roleError);
+        }
+
+        // Create profile in the appropriate table based on role
+        const profileTable = role === 'parent' ? 'parent_profiles' : 'child_profiles';
+        const { error: profileError } = await supabase
+          .from(profileTable)
+          .upsert({
+            user_id: data.user.id,
             display_name: displayName || null
           }, { onConflict: 'user_id' });
 

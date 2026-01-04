@@ -17,11 +17,11 @@ export interface MoodEntry {
 export const useMoodProgress = (childUserId?: string) => {
   const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user, profile } = useAuth();
+  const { user, role } = useAuth();
   const { toast } = useToast();
 
   const targetUserId = childUserId || user?.id;
-  const isParentViewing = profile?.role === 'parent' && childUserId;
+  const isParentViewing = role === 'parent' && childUserId;
 
   const fetchMoodEntries = useCallback(async () => {
     if (!targetUserId) return;
@@ -66,7 +66,7 @@ export const useMoodProgress = (childUserId?: string) => {
     try {
       const moodData = {
         user_id: user.id,
-        child_user_id: profile?.role === 'parent' ? childUserId : null,
+        child_user_id: role === 'parent' ? childUserId : null,
         mood_emoji: moodEmoji,
         date: format(date, 'yyyy-MM-dd'),
         notes: notes || null
@@ -98,7 +98,7 @@ export const useMoodProgress = (childUserId?: string) => {
       });
       return { error: "Failed to save mood" };
     }
-  }, [user, profile?.role, childUserId, toast, fetchMoodEntries, isParentViewing]);
+  }, [user, role, childUserId, toast, fetchMoodEntries, isParentViewing]);
 
   const getMoodForDate = useCallback((date: Date) => {
     const dateStr = format(date, 'yyyy-MM-dd');

@@ -3,28 +3,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, Heart, Star, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useAuth, UserRole } from "@/hooks/useAuth";
+import { Sparkles, Heart, Star, Mail, Lock, Eye, EyeOff, Gamepad2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
-const LoginPage = () => {
+const ChildLoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role: "child" as UserRole
   });
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await signIn(formData.email, formData.password);
+    const { error } = await signIn(formData.email, formData.password, 'child');
     
-    // Let the App.tsx routing handle navigation based on role
-    // No manual navigation needed here
+    if (!error) {
+      navigate('/child');
+    }
     
     setLoading(false);
   };
@@ -44,10 +44,10 @@ const LoginPage = () => {
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-2 mb-6">
             <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center shadow-fun animate-bounce-in">
-              <Heart className="h-6 w-6 text-primary-foreground" />
+              <Gamepad2 className="h-6 w-6 text-primary-foreground" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-fun bg-clip-text text-transparent font-comic">
-              EMR Play
+              Kids Zone
             </h1>
           </div>
           <p className="text-lg text-muted-foreground font-comic">
@@ -59,7 +59,7 @@ const LoginPage = () => {
         <Card className="shadow-fun bg-card/80 backdrop-blur border-2 border-primary/20 hover-lift">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-comic text-foreground">
-              Sign In
+              Kid Sign In
             </CardTitle>
             <CardDescription className="font-comic">
               Continue your emotional learning journey
@@ -67,25 +67,6 @@ const LoginPage = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="role" className="font-comic text-foreground">
-                  I am signing in as
-                </Label>
-                <Select value={formData.role} onValueChange={(value: UserRole) => setFormData({...formData, role: value})}>
-                  <SelectTrigger className="font-comic">
-                    <SelectValue placeholder="Choose your role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="child" className="font-comic">
-                      🧒 Child
-                    </SelectItem>
-                    <SelectItem value="parent" className="font-comic">
-                      👨‍👩‍👧‍👦 Parent
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="email" className="font-comic text-foreground">
                   Email Address
@@ -147,27 +128,38 @@ const LoginPage = () => {
           </CardContent>
         </Card>
 
-
         {/* Sign Up Link */}
         <div className="text-center">
           <p className="text-sm text-muted-foreground font-comic">
             New to EMR Play?{" "}
             <Link 
-              to="/signup" 
+              to="/child/signup" 
               className="text-primary hover:underline font-bold"
             >
-              Create an account
+              Create kid account
             </Link>
           </p>
         </div>
 
-        {/* Supabase Notice */}
+        {/* Parent Login Link */}
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground font-comic">
+            Are you a parent?{" "}
+            <Link 
+              to="/parent/login" 
+              className="text-primary hover:underline font-bold"
+            >
+              Parent Sign In
+            </Link>
+          </p>
+        </div>
+
+        {/* Fun Notice */}
         <Card className="bg-gradient-primary text-primary-foreground shadow-fun">
           <CardContent className="p-4 text-center">
-            <h4 className="font-bold font-comic mb-2">🔒 Secure & Safe</h4>
+            <h4 className="font-bold font-comic mb-2">🎮 Fun & Safe</h4>
             <p className="text-sm opacity-90 font-comic">
-              Your child's data is protected with enterprise-grade security. 
-              We never share personal information.
+              Your adventure continues here! Learn about emotions while having fun.
             </p>
           </CardContent>
         </Card>
@@ -176,4 +168,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default ChildLoginPage;
