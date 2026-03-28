@@ -172,6 +172,34 @@ const ClassroomMazePage = () => {
   const [totalChoices, setTotalChoices] = useState(0);
   const [choiceResult, setChoiceResult] = useState<{ isGood: boolean; explanation: string } | null>(null);
   const [visitedCells, setVisitedCells] = useState<Set<string>>(new Set(["0,0"]));
+  const [gameLost, setGameLost] = useState(false);
+
+  // BFS to check if a path exists from player to exit
+  const hasPathToExit = useCallback((fromX: number, fromY: number, blocked: Record<string, boolean>, mazeGrid: MazeCell[][]): boolean => {
+    if (fromX === COLS - 1 && fromY === ROWS - 1) return true;
+    const visited = new Set<string>();
+    const queue: [number, number][] = [[fromX, fromY]];
+    visited.add(`${fromX},${fromY}`);
+
+    while (queue.length > 0) {
+      const [cx, cy] = queue.shift()!;
+      const cell = mazeGrid[cy][cx];
+      const dirs: [number, number, keyof typeof cell.walls][] = [
+        [0, -1, "top"], [1, 0, "right"], [0, 1, "bottom"], [-1, 0, "left"],
+      ];
+      for (const [dx, dy, wall] of dirs) {
+        const nx = cx + dx;
+        const ny = cy + dy;
+        const key = `${nx},${ny}`;
+        if (nx < 0 || nx >= COLS || ny < 0 || ny >= ROWS) continue;
+        if (visited.has(key) || blocked[key] || cell.walls[wall]) continue;
+        if (nx === COLS - 1 && ny === ROWS - 1) return true;
+        visited.add(key);
+        queue.push([nx, ny]);
+      }
+    }
+    return false;
+  }, []);
 
   const canMove = (dx: number, dy: number): boolean => {
     const nx = playerPos.x + dx;
@@ -194,7 +222,7 @@ const ClassroomMazePage = () => {
   };
 
   const move = useCallback((dx: number, dy: number) => {
-    if (activeScenario || gameComplete || choiceResult) return;
+    if (activeScenario || gameComplete || gameLost || choiceResult) return;
     if (!canMove(dx, dy)) return;
 
     const nx = playerPos.x + dx;
@@ -217,7 +245,7 @@ const ClassroomMazePage = () => {
       setGameComplete(true);
       saveCompletion();
     }
-  }, [playerPos, activeScenario, gameComplete, maze, scenarioStates, blockedPaths, choiceResult]);
+  }, [playerPos, activeScenario, gameComplete, gameLost, maze, scenarioStates, blockedPaths, choiceResult, hasPathToExit]);
 
   const handleChoice = (choiceIndex: number) => {
     if (!activeScenario) return;
@@ -270,6 +298,11 @@ const ClassroomMazePage = () => {
     setScenarioStates(newScenarioStates);
     setBlockedPaths(newBlocked);
     setChoiceResult({ isGood: choice.isGood, explanation: choice.explanation });
+
+    // Check if path to exit is still possible after blocking
+    if (!choice.isGood && !hasPathToExit(playerPos.x, playerPos.y, newBlocked, maze)) {
+      setGameLost(true);
+    }
   };
 
   const dismissResult = () => {
@@ -299,6 +332,7 @@ const ClassroomMazePage = () => {
     setScenarioStates({});
     setBlockedPaths({});
     setGameComplete(false);
+    setGameLost(false);
     setGoodChoices(0);
     setTotalChoices(0);
     setChoiceResult(null);
@@ -377,7 +411,34 @@ const ClassroomMazePage = () => {
           </Card>
         )}
 
-        {/* Scenario Modal */}
+        {/* Game Lost */}
+        {gameLost && (
+          <Card className="bg-gradient-to-r from-red-400 to-orange-500 text-white shadow-fun animate-in fade-in-0 zoom-in-95">
+            <CardContent className="p-6 text-center space-y-4">
+              <XCircle className="h-16 w-16 mx-auto text-white/80" />
+              <h2 className="text-3xl font-bold font-comic">No Path Left! 😞</h2>
+              <p className="text-lg font-comic">
+                Your wrong choices blocked all paths to the exit.
+              </p>
+              <p className="font-comic opacity-90">
+                Remember: every choice has consequences. But you can always try again and learn from your mistakes! 💪
+              </p>
+              <p className="font-comic text-sm opacity-80">
+                You made {goodChoices} good choices out of {totalChoices} total.
+              </p>
+              <div className="flex justify-center gap-3">
+                <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/40" onClick={resetGame}>
+                  Try Again
+                </Button>
+                <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/40" asChild>
+                  <Link to="/activities">Back to Activities</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+
         {activeScenario && !choiceResult && (
           <Card className="border-2 border-primary shadow-fun animate-in fade-in-0 zoom-in-95">
             <CardHeader className="text-center pb-2">
@@ -491,7 +552,7 @@ const ClassroomMazePage = () => {
         </Card>
 
         {/* Controls */}
-        {!gameComplete && (
+        {!gameComplete && !gameLost && (
           <div className="flex justify-center">
             <div className="grid grid-cols-3 gap-2 w-fit">
               <div />
