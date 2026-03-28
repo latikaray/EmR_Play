@@ -17,42 +17,56 @@ const HomePage = () => {
       description: "Express feelings through colorful art",
       icon: "🎨",
       color: "bg-fun-pink",
-      path: "/activities/draw"
+      path: "/activities/draw",
+      ageGroup: "5-12"
     },
     {
       title: "Emoji Match",
       description: "Match emotions with fun emoji games",
       icon: "😊",
       color: "bg-fun-yellow",
-      path: "/activities/emoji-match"
+      path: "/activities/emoji-match",
+      ageGroup: "5-12"
     },
     {
       title: "Story Time",
       description: "Interactive stories about emotions",
       icon: "📚",
       color: "bg-accent",
-      path: "/activities/story"
+      path: "/activities/story",
+      ageGroup: "5-12"
     },
     {
       title: "Breathing Fun",
       description: "Calm down with guided breathing",
       icon: "🫁",
       color: "bg-fun-teal",
-      path: "/activities/breathing"
+      path: "/activities/breathing",
+      ageGroup: "all"
     },
     {
       title: "Gratitude Journal",
       description: "Write about things that make you happy",
       icon: "📝",
       color: "bg-secondary",
-      path: "/activities/gratitude"
+      path: "/activities/gratitude",
+      ageGroup: "13-16"
     },
     {
       title: "Emotion Wheel",
       description: "Spin the wheel to explore different emotions",
       icon: "🎯",
       color: "bg-fun-orange",
-      path: "/activities/emotion-wheel"
+      path: "/activities/emotion-wheel",
+      ageGroup: "5-12"
+    },
+    {
+      title: "Classroom Maze",
+      description: "Navigate real-life teen scenarios in a maze",
+      icon: "🏫",
+      color: "bg-fun-orange",
+      path: "/activities/classroom-maze",
+      ageGroup: "13-16"
     },
   ];
 
