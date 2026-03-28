@@ -245,7 +245,7 @@ const ClassroomMazePage = () => {
       setGameComplete(true);
       saveCompletion();
     }
-  }, [playerPos, activeScenario, gameComplete, maze, scenarioStates, blockedPaths, choiceResult]);
+  }, [playerPos, activeScenario, gameComplete, gameLost, maze, scenarioStates, blockedPaths, choiceResult, hasPathToExit]);
 
   const handleChoice = (choiceIndex: number) => {
     if (!activeScenario) return;
@@ -332,6 +332,7 @@ const ClassroomMazePage = () => {
     setScenarioStates({});
     setBlockedPaths({});
     setGameComplete(false);
+    setGameLost(false);
     setGoodChoices(0);
     setTotalChoices(0);
     setChoiceResult(null);
@@ -410,7 +411,34 @@ const ClassroomMazePage = () => {
           </Card>
         )}
 
-        {/* Scenario Modal */}
+        {/* Game Lost */}
+        {gameLost && (
+          <Card className="bg-gradient-to-r from-red-400 to-orange-500 text-white shadow-fun animate-in fade-in-0 zoom-in-95">
+            <CardContent className="p-6 text-center space-y-4">
+              <XCircle className="h-16 w-16 mx-auto text-white/80" />
+              <h2 className="text-3xl font-bold font-comic">No Path Left! 😞</h2>
+              <p className="text-lg font-comic">
+                Your wrong choices blocked all paths to the exit.
+              </p>
+              <p className="font-comic opacity-90">
+                Remember: every choice has consequences. But you can always try again and learn from your mistakes! 💪
+              </p>
+              <p className="font-comic text-sm opacity-80">
+                You made {goodChoices} good choices out of {totalChoices} total.
+              </p>
+              <div className="flex justify-center gap-3">
+                <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/40" onClick={resetGame}>
+                  Try Again
+                </Button>
+                <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/40" asChild>
+                  <Link to="/activities">Back to Activities</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+
         {activeScenario && !choiceResult && (
           <Card className="border-2 border-primary shadow-fun animate-in fade-in-0 zoom-in-95">
             <CardHeader className="text-center pb-2">
