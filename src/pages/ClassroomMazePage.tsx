@@ -222,7 +222,7 @@ const ClassroomMazePage = () => {
   };
 
   const move = useCallback((dx: number, dy: number) => {
-    if (activeScenario || gameComplete || choiceResult) return;
+    if (activeScenario || gameComplete || gameLost || choiceResult) return;
     if (!canMove(dx, dy)) return;
 
     const nx = playerPos.x + dx;
