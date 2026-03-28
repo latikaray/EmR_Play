@@ -298,6 +298,11 @@ const ClassroomMazePage = () => {
     setScenarioStates(newScenarioStates);
     setBlockedPaths(newBlocked);
     setChoiceResult({ isGood: choice.isGood, explanation: choice.explanation });
+
+    // Check if path to exit is still possible after blocking
+    if (!choice.isGood && !hasPathToExit(playerPos.x, playerPos.y, newBlocked, maze)) {
+      setGameLost(true);
+    }
   };
 
   const dismissResult = () => {
