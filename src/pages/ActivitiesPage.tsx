@@ -74,6 +74,20 @@ const baseActivities: ActivityDef[] = [
     badges: ["Decision Maker", "Path Finder", "Life Skills Pro"], color: "bg-fun-orange",
     path: "/activities/classroom-maze", activityType: "game", eqTrait: "Decision Making", ageGroup: "13-16",
   },
+  {
+    id: "conflict-roleplay", title: "Conflict Resolution Roleplay",
+    description: "Practice handling real-life conflicts through interactive dialogue scenarios",
+    icon: "🎭", difficulty: "Medium", duration: "10-20 min", participants: "Solo",
+    badges: ["Peacemaker", "Assertive Communicator"], color: "bg-fun-teal",
+    path: "/activities/conflict-roleplay", activityType: "roleplay", eqTrait: "Conflict Resolution", ageGroup: "13-16",
+  },
+  {
+    id: "eq-quiz", title: "EQ Quiz",
+    description: "Discover your emotional intelligence strengths and areas to grow",
+    icon: "🧠", difficulty: "Easy", duration: "8-12 min", participants: "Solo",
+    badges: ["Self-Aware", "EQ Explorer"], color: "bg-fun-pink",
+    path: "/activities/eq-quiz", activityType: "quiz", eqTrait: "Emotional Intelligence", ageGroup: "13-16",
+  },
 ];
 
 const ageGroupLabels: Record<string, { label: string; emoji: string; description: string }> = {

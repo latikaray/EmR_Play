@@ -552,7 +552,7 @@ const ClassroomMazePage = () => {
         </Card>
 
         {/* Controls */}
-        {!gameComplete && (
+        {!gameComplete && !gameLost && (
           <div className="flex justify-center">
             <div className="grid grid-cols-3 gap-2 w-fit">
               <div />
