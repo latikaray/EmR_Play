@@ -172,6 +172,34 @@ const ClassroomMazePage = () => {
   const [totalChoices, setTotalChoices] = useState(0);
   const [choiceResult, setChoiceResult] = useState<{ isGood: boolean; explanation: string } | null>(null);
   const [visitedCells, setVisitedCells] = useState<Set<string>>(new Set(["0,0"]));
+  const [gameLost, setGameLost] = useState(false);
+
+  // BFS to check if a path exists from player to exit
+  const hasPathToExit = useCallback((fromX: number, fromY: number, blocked: Record<string, boolean>, mazeGrid: MazeCell[][]): boolean => {
+    if (fromX === COLS - 1 && fromY === ROWS - 1) return true;
+    const visited = new Set<string>();
+    const queue: [number, number][] = [[fromX, fromY]];
+    visited.add(`${fromX},${fromY}`);
+
+    while (queue.length > 0) {
+      const [cx, cy] = queue.shift()!;
+      const cell = mazeGrid[cy][cx];
+      const dirs: [number, number, keyof typeof cell.walls][] = [
+        [0, -1, "top"], [1, 0, "right"], [0, 1, "bottom"], [-1, 0, "left"],
+      ];
+      for (const [dx, dy, wall] of dirs) {
+        const nx = cx + dx;
+        const ny = cy + dy;
+        const key = `${nx},${ny}`;
+        if (nx < 0 || nx >= COLS || ny < 0 || ny >= ROWS) continue;
+        if (visited.has(key) || blocked[key] || cell.walls[wall]) continue;
+        if (nx === COLS - 1 && ny === ROWS - 1) return true;
+        visited.add(key);
+        queue.push([nx, ny]);
+      }
+    }
+    return false;
+  }, []);
 
   const canMove = (dx: number, dy: number): boolean => {
     const nx = playerPos.x + dx;
