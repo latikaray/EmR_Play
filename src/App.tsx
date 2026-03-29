@@ -24,6 +24,8 @@ import DrawMoodPage from "./pages/DrawMoodPage";
 import ClassroomMazePage from "./pages/ClassroomMazePage";
 import ConflictRolePlayPage from "./pages/ConflictRolePlayPage";
 import EQQuizPage from "./pages/EQQuizPage";
+import PeerPressureSimPage from "./pages/PeerPressureSimPage";
+import PeerPressureGuidePage from "./pages/PeerPressureGuidePage";
 import ParentHomePage from "./pages/ParentHomePage";
 import ParentRolePlayPage from "./pages/ParentRolePlayPage";
 import ParentQuizzesPage from "./pages/ParentQuizzesPage";
@@ -76,6 +78,8 @@ const AppRouter = () => {
         <Route path="/activities/classroom-maze" element={user && role === 'child' ? <ClassroomMazePage /> : <Navigate to="/child/login" replace />} />
         <Route path="/activities/conflict-roleplay" element={user && role === 'child' ? <ConflictRolePlayPage /> : <Navigate to="/child/login" replace />} />
         <Route path="/activities/eq-quiz" element={user && role === 'child' ? <EQQuizPage /> : <Navigate to="/child/login" replace />} />
+        <Route path="/activities/peer-pressure-sim" element={user && role === 'child' ? <PeerPressureSimPage /> : <Navigate to="/child/login" replace />} />
+        <Route path="/activities/peer-pressure-guide" element={user && role === 'child' ? <PeerPressureGuidePage /> : <Navigate to="/child/login" replace />} />
         <Route path="/child-progress" element={user && role === 'child' ? <ChildProgressPage /> : <Navigate to="/child/login" replace />} />
         
         {/* Parent routes - only accessible by parents */}
