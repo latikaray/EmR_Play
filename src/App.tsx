@@ -78,6 +78,8 @@ const AppRouter = () => {
         <Route path="/activities/classroom-maze" element={user && role === 'child' ? <ClassroomMazePage /> : <Navigate to="/child/login" replace />} />
         <Route path="/activities/conflict-roleplay" element={user && role === 'child' ? <ConflictRolePlayPage /> : <Navigate to="/child/login" replace />} />
         <Route path="/activities/eq-quiz" element={user && role === 'child' ? <EQQuizPage /> : <Navigate to="/child/login" replace />} />
+        <Route path="/activities/peer-pressure-sim" element={user && role === 'child' ? <PeerPressureSimPage /> : <Navigate to="/child/login" replace />} />
+        <Route path="/activities/peer-pressure-guide" element={user && role === 'child' ? <PeerPressureGuidePage /> : <Navigate to="/child/login" replace />} />
         <Route path="/child-progress" element={user && role === 'child' ? <ChildProgressPage /> : <Navigate to="/child/login" replace />} />
         
         {/* Parent routes - only accessible by parents */}
