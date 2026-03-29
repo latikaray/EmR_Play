@@ -190,7 +190,7 @@ const PeerPressureSimPage = () => {
       setSelectedChoice(null);
     } else {
       setGameComplete(true);
-      saveCompletion("peer-pressure-sim", "simulation", "Assertiveness");
+      recordActivityCompletion("peer-pressure-sim", "simulation", "Assertiveness");
     }
   };
 
