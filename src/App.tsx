@@ -24,6 +24,8 @@ import DrawMoodPage from "./pages/DrawMoodPage";
 import ClassroomMazePage from "./pages/ClassroomMazePage";
 import ConflictRolePlayPage from "./pages/ConflictRolePlayPage";
 import EQQuizPage from "./pages/EQQuizPage";
+import PeerPressureSimPage from "./pages/PeerPressureSimPage";
+import PeerPressureGuidePage from "./pages/PeerPressureGuidePage";
 import ParentHomePage from "./pages/ParentHomePage";
 import ParentRolePlayPage from "./pages/ParentRolePlayPage";
 import ParentQuizzesPage from "./pages/ParentQuizzesPage";

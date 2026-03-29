@@ -88,6 +88,20 @@ const baseActivities: ActivityDef[] = [
     badges: ["Self-Aware", "EQ Explorer"], color: "bg-fun-pink",
     path: "/activities/eq-quiz", activityType: "quiz", eqTrait: "Emotional Intelligence", ageGroup: "13-16",
   },
+  {
+    id: "peer-pressure-sim", title: "Peer Pressure Simulator",
+    description: "Navigate real social situations at parties, school, and online — make smart choices!",
+    icon: "🛡️", difficulty: "Medium", duration: "15-20 min", participants: "Solo",
+    badges: ["Assertive", "Pressure-Proof"], color: "bg-fun-yellow",
+    path: "/activities/peer-pressure-sim", activityType: "simulation", eqTrait: "Assertiveness", ageGroup: "13-16",
+  },
+  {
+    id: "peer-pressure-guide", title: "Peer Pressure Guide",
+    description: "Interactive emoji guide covering every peer pressure situation teens face",
+    icon: "📖", difficulty: "Easy", duration: "10-15 min", participants: "Solo",
+    badges: ["Informed", "Self-Aware"], color: "bg-secondary",
+    path: "/activities/peer-pressure-guide", activityType: "guide", eqTrait: "Self-Awareness", ageGroup: "13-16",
+  },
 ];
 
 const ageGroupLabels: Record<string, { label: string; emoji: string; description: string }> = {
