@@ -171,7 +171,7 @@ const PeerPressureSimPage = () => {
   const [totalScore, setTotalScore] = useState(0);
   const [completedScenarios, setCompletedScenarios] = useState<number[]>([]);
   const [gameComplete, setGameComplete] = useState(false);
-  const { saveCompletion } = useActivityProgress();
+  const { recordActivityCompletion } = useActivityProgress();
 
   const scenario = scenarios[currentScenario];
   const progress = ((completedScenarios.length) / scenarios.length) * 100;
