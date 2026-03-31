@@ -32,6 +32,7 @@ import ParentQuizzesPage from "./pages/ParentQuizzesPage";
 import ParentJournalPage from "./pages/ParentJournalPage";
 import ParentMiniGamesPage from "./pages/ParentMiniGamesPage";
 import ParentArticlesPage from "./pages/ParentArticlesPage";
+import ParentingGuidesPage from "./pages/ParentingGuidesPage";
 import ChildProgressPage from "./pages/ChildProgressPage";
 import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
@@ -91,6 +92,7 @@ const AppRouter = () => {
         <Route path="/parent/journal" element={user && role === 'parent' ? <ParentJournalPage /> : <Navigate to="/parent/login" replace />} />
         <Route path="/parent/mini-games" element={user && role === 'parent' ? <ParentMiniGamesPage /> : <Navigate to="/parent/login" replace />} />
         <Route path="/parent/articles" element={user && role === 'parent' ? <ParentArticlesPage /> : <Navigate to="/parent/login" replace />} />
+        <Route path="/parent/guide-library" element={user && role === 'parent' ? <ParentingGuidesPage /> : <Navigate to="/parent/login" replace />} />
         <Route path="/parent/child-progress" element={user && role === 'parent' ? <ChildProgressPage /> : <Navigate to="/parent/login" replace />} />
         
         {/* Shared routes */}
