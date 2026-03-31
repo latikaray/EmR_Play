@@ -92,6 +92,7 @@ const AppRouter = () => {
         <Route path="/parent/journal" element={user && role === 'parent' ? <ParentJournalPage /> : <Navigate to="/parent/login" replace />} />
         <Route path="/parent/mini-games" element={user && role === 'parent' ? <ParentMiniGamesPage /> : <Navigate to="/parent/login" replace />} />
         <Route path="/parent/articles" element={user && role === 'parent' ? <ParentArticlesPage /> : <Navigate to="/parent/login" replace />} />
+        <Route path="/parent/guide-library" element={user && role === 'parent' ? <ParentingGuidesPage /> : <Navigate to="/parent/login" replace />} />
         <Route path="/parent/child-progress" element={user && role === 'parent' ? <ChildProgressPage /> : <Navigate to="/parent/login" replace />} />
         
         {/* Shared routes */}
