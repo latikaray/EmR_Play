@@ -32,6 +32,7 @@ import ParentQuizzesPage from "./pages/ParentQuizzesPage";
 import ParentJournalPage from "./pages/ParentJournalPage";
 import ParentMiniGamesPage from "./pages/ParentMiniGamesPage";
 import ParentArticlesPage from "./pages/ParentArticlesPage";
+import ParentingGuidesPage from "./pages/ParentingGuidesPage";
 import ChildProgressPage from "./pages/ChildProgressPage";
 import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
