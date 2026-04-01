@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Star, Target, Award, ArrowRight, Sparkles } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Heart, Star, Target, Award, ArrowRight, Sparkles, Flame, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useGamification } from "@/hooks/useGamification";
 
 const HomePage = () => {
   const quickStats = [
