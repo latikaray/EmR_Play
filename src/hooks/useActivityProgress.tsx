@@ -96,6 +96,8 @@ export const useActivityProgress = (childUserId?: string) => {
 
       // Refresh data
       await fetchActivityCompletions();
+
+      // XP is awarded separately via useGamification hook in components
       
       return { success: true };
     } catch (error) {

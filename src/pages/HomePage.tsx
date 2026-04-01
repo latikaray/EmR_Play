@@ -1,14 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Star, Target, Award, ArrowRight, Sparkles } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Heart, Star, Target, Award, ArrowRight, Sparkles, Flame, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useGamification } from "@/hooks/useGamification";
 
 const HomePage = () => {
+  const { userXP, earnedBadges, level, levelProgress, loading: gamLoading } = useGamification();
+
   const quickStats = [
-    { icon: Target, label: "Activities Completed", value: "12", color: "text-fun-pink" },
-    { icon: Star, label: "Mood Score", value: "8.5", color: "text-fun-yellow" },
-    { icon: Award, label: "Badges Earned", value: "5", color: "text-accent" },
-    { icon: Heart, label: "Days Active", value: "7", color: "text-secondary" },
+    { icon: Target, label: "Total XP", value: String(userXP.total_xp), color: "text-fun-pink" },
+    { icon: Star, label: "Level", value: String(level), color: "text-fun-yellow" },
+    { icon: Award, label: "Badges", value: String(earnedBadges.length), color: "text-accent" },
+    { icon: Flame, label: "Streak", value: `${userXP.current_streak}🔥`, color: "text-secondary" },
   ];
 
   const activityCategories = [
@@ -185,28 +189,39 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Progress Summary */}
+        {/* XP & Level Progress */}
         <Card className="bg-gradient-primary text-primary-foreground shadow-fun">
           <CardHeader>
             <CardTitle className="text-2xl font-comic flex items-center gap-2">
-              <Award className="h-6 w-6" />
-              Your Emotional Journey
+              <Trophy className="h-6 w-6" />
+              Your Journey — Level {level}
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="mb-4">
+              <Progress value={levelProgress.progress} className="h-3 bg-white/20" />
+              <p className="text-xs opacity-80 font-comic mt-1 text-center">
+                {levelProgress.current} / {levelProgress.needed} XP to Level {level + 1}
+              </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center">
-                <p className="text-3xl font-bold font-comic">75%</p>
-                <p className="text-sm opacity-90 font-comic">This Week's Progress</p>
+                <p className="text-3xl font-bold font-comic">{userXP.total_xp}</p>
+                <p className="text-sm opacity-90 font-comic">Total XP</p>
               </div>
               <div className="text-center">
-                <p className="text-3xl font-bold font-comic">3</p>
-                <p className="text-sm opacity-90 font-comic">New Badges Available</p>
+                <p className="text-3xl font-bold font-comic">{earnedBadges.length}</p>
+                <p className="text-sm opacity-90 font-comic">Badges Earned</p>
               </div>
               <div className="text-center">
-                <p className="text-3xl font-bold font-comic">Happy</p>
-                <p className="text-sm opacity-90 font-comic">Most Common Mood</p>
+                <p className="text-3xl font-bold font-comic">{userXP.current_streak}🔥</p>
+                <p className="text-sm opacity-90 font-comic">Day Streak</p>
               </div>
+            </div>
+            <div className="text-center mt-4">
+              <Button variant="outline" size="sm" className="bg-white/10 hover:bg-white/20 border-white/20 text-primary-foreground font-comic" asChild>
+                <Link to="/badges">View All Badges & Avatars →</Link>
+              </Button>
             </div>
           </CardContent>
         </Card>

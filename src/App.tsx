@@ -34,6 +34,7 @@ import ParentMiniGamesPage from "./pages/ParentMiniGamesPage";
 import ParentArticlesPage from "./pages/ParentArticlesPage";
 import ParentingGuidesPage from "./pages/ParentingGuidesPage";
 import ChildProgressPage from "./pages/ChildProgressPage";
+import BadgesPage from "./pages/BadgesPage";
 import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 
@@ -98,6 +99,7 @@ const AppRouter = () => {
         {/* Shared routes */}
         <Route path="/progress" element={user ? <ChildProgressPage /> : <Navigate to="/welcome" replace />} />
         <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/welcome" replace />} />
+        <Route path="/badges" element={user ? <BadgesPage /> : <Navigate to="/welcome" replace />} />
         
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
