@@ -90,19 +90,34 @@ const ParentHomePage = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 mb-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary font-comic">{completedActivities.length}</div>
-                <div className="text-sm text-muted-foreground font-comic">Activities Completed</div>
+                <div className="text-2xl font-bold text-primary font-comic">{userXP.total_xp}</div>
+                <div className="text-sm text-muted-foreground font-comic">Total XP</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary font-comic">2</div>
-                <div className="text-sm text-muted-foreground font-comic">Insights Gained</div>
+                <div className="text-2xl font-bold text-primary font-comic flex items-center gap-1">
+                  <Star className="h-4 w-4" /> {level}
+                </div>
+                <div className="text-sm text-muted-foreground font-comic">Level</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary font-comic">5</div>
+                <div className="text-2xl font-bold text-primary font-comic">{earnedBadges.length}</div>
+                <div className="text-sm text-muted-foreground font-comic">Badges</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary font-comic flex items-center gap-1">
+                  <Flame className="h-4 w-4 text-fun-orange" /> {userXP.current_streak}
+                </div>
                 <div className="text-sm text-muted-foreground font-comic">Day Streak</div>
               </div>
+            </div>
+            <Progress value={levelProgress.progress} className="h-2 mb-1" />
+            <p className="text-xs text-muted-foreground font-comic">{levelProgress.current}/{levelProgress.needed} XP to Level {level + 1}</p>
+            <div className="mt-2">
+              <Button variant="outline" size="sm" asChild className="font-comic">
+                <Link to="/badges">View Badges & Avatars →</Link>
+              </Button>
             </div>
             
             {completedActivities.length > 0 && (

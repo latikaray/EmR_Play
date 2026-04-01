@@ -99,6 +99,7 @@ const AppRouter = () => {
         {/* Shared routes */}
         <Route path="/progress" element={user ? <ChildProgressPage /> : <Navigate to="/welcome" replace />} />
         <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/welcome" replace />} />
+        <Route path="/badges" element={user ? <BadgesPage /> : <Navigate to="/welcome" replace />} />
         
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
