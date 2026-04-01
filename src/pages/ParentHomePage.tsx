@@ -9,6 +9,7 @@ import LinkChildAccount from "@/components/LinkChildAccount";
 import { useGamification } from "@/hooks/useGamification";
 
 const ParentHomePage = () => {
+  const { userXP, earnedBadges, level, levelProgress } = useGamification();
   const [completedActivities] = useState([
     { name: "Role Play: Dinner Refusal", type: "scenario", date: "Today" },
     { name: "Quiz: Child Emotional Support", type: "quiz", date: "Yesterday" },
