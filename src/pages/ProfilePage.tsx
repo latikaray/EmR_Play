@@ -38,6 +38,7 @@ const ProfilePage = () => {
     avatar: ""
   });
   const { user, signOut, deleteAccount, profile, role } = useAuth();
+  const { userXP, earnedBadges, level, levelProgress, unlockedAvatars, allAvatars } = useGamification();
   const navigate = useNavigate();
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
