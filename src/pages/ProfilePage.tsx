@@ -23,10 +23,11 @@ import {
   Trash2
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import EnterLinkCode from "@/components/EnterLinkCode";
+import { useGamification } from "@/hooks/useGamification";
 
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
