@@ -6,11 +6,13 @@ import { Link } from "react-router-dom";
 import { useGamification } from "@/hooks/useGamification";
 
 const HomePage = () => {
+  const { userXP, earnedBadges, level, levelProgress, loading: gamLoading } = useGamification();
+
   const quickStats = [
-    { icon: Target, label: "Activities Completed", value: "12", color: "text-fun-pink" },
-    { icon: Star, label: "Mood Score", value: "8.5", color: "text-fun-yellow" },
-    { icon: Award, label: "Badges Earned", value: "5", color: "text-accent" },
-    { icon: Heart, label: "Days Active", value: "7", color: "text-secondary" },
+    { icon: Target, label: "Total XP", value: String(userXP.total_xp), color: "text-fun-pink" },
+    { icon: Star, label: "Level", value: String(level), color: "text-fun-yellow" },
+    { icon: Award, label: "Badges", value: String(earnedBadges.length), color: "text-accent" },
+    { icon: Flame, label: "Streak", value: `${userXP.current_streak}🔥`, color: "text-secondary" },
   ];
 
   const activityCategories = [
