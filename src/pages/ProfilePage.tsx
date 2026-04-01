@@ -308,7 +308,7 @@ const ProfilePage = () => {
           </CardContent>
         </Card>
 
-        {/* Achievements */}
+        {/* Badges & Achievements Link */}
         <Card className="shadow-activity bg-card/80 backdrop-blur">
           <CardHeader>
             <CardTitle className="text-xl font-comic text-foreground flex items-center gap-2">
@@ -316,30 +316,57 @@ const ProfilePage = () => {
               My Achievements
             </CardTitle>
             <CardDescription className="font-comic">
-              Amazing things you've accomplished!
+              {earnedBadges.length} badges earned — Level {level}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {achievements.map((achievement, index) => (
-                <div key={achievement.name} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 hover-lift">
-                  <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center text-lg shadow-sm animate-float" style={{ animationDelay: `${index * 0.2}s` }}>
-                    {achievement.icon}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {earnedBadges.slice(0, 6).map((eb) => {
+                const badgeDef = allAvatars.find(a => a.id === eb.badge_id);
+                return (
+                  <div key={eb.badge_id} className="text-2xl animate-float">
+                    {badgeDef?.emoji || '🏅'}
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold font-comic text-foreground">{achievement.name}</h4>
-                    <p className="text-sm text-muted-foreground font-comic">{achievement.description}</p>
-                    <p className="text-xs text-muted-foreground font-comic mt-1">
-                      {new Date(achievement.date).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <Badge variant="outline" className="font-comic">
-                    <Star className="h-3 w-3 mr-1" />
-                    New
-                  </Badge>
-                </div>
-              ))}
+                );
+              })}
+              {earnedBadges.length === 0 && (
+                <p className="text-sm text-muted-foreground font-comic">Complete activities to earn badges!</p>
+              )}
             </div>
+            <Button variant="fun" className="w-full font-comic" asChild>
+              <Link to="/badges">View All Badges & Avatars 🏆</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Unlockable Avatars Preview */}
+        <Card className="shadow-activity bg-card/80 backdrop-blur">
+          <CardHeader>
+            <CardTitle className="text-xl font-comic text-foreground flex items-center gap-2">
+              🎭 Unlockable Avatars
+            </CardTitle>
+            <CardDescription className="font-comic">
+              {unlockedAvatars.length}/{allAvatars.length} unlocked
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              {allAvatars.slice(0, 6).map((avatar) => {
+                const unlocked = unlockedAvatars.find(u => u.avatar_id === avatar.id);
+                return (
+                  <div
+                    key={avatar.id}
+                    className={`text-3xl p-2 rounded-lg ${unlocked ? 'bg-primary/10' : 'grayscale opacity-40'}`}
+                    title={unlocked ? avatar.name : `Unlock at ${avatar.xpRequired} XP`}
+                  >
+                    {avatar.emoji}
+                  </div>
+                );
+              })}
+            </div>
+            <Button variant="outline" className="w-full mt-3 font-comic" asChild>
+              <Link to="/badges">See All →</Link>
+            </Button>
           </CardContent>
         </Card>
 
