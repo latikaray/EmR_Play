@@ -70,10 +70,10 @@ const ProfilePage = () => {
   ];
 
   const stats = [
-    { label: "Days Active", value: "24", icon: Calendar, color: "text-accent" },
-    { label: "Activities Done", value: "42", icon: Target, color: "text-fun-pink" },
-    { label: "Badges Earned", value: "5", icon: Award, color: "text-fun-yellow" },
-    { label: "Mood Score", value: "8.5", icon: Star, color: "text-secondary" },
+    { label: "Total XP", value: String(userXP.total_xp), icon: Target, color: "text-fun-pink" },
+    { label: "Level", value: String(level), icon: Star, color: "text-fun-yellow" },
+    { label: "Badges", value: String(earnedBadges.length), icon: Award, color: "text-accent" },
+    { label: "Streak", value: `${userXP.current_streak}🔥`, icon: Calendar, color: "text-secondary" },
   ];
 
   const handleAvatarClick = () => {
