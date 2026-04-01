@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, BookOpen, MessageSquare, Gamepad2, FileText, Users, Brain, Coffee, Link2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Heart, BookOpen, MessageSquare, Gamepad2, FileText, Users, Brain, Coffee, Link2, Trophy, Flame, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import LinkChildAccount from "@/components/LinkChildAccount";
+import { useGamification } from "@/hooks/useGamification";
 
 const ParentHomePage = () => {
   const [completedActivities] = useState([
