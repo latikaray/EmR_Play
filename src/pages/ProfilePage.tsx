@@ -53,14 +53,6 @@ const ProfilePage = () => {
     }
   }, [profile?.display_name, profile?.avatar_url]);
 
-  const achievements = [
-    { name: "First Drawing", icon: "🎨", date: "2024-01-15", description: "Completed your first mood drawing!" },
-    { name: "Story Master", icon: "📚", date: "2024-01-20", description: "Read 5 emotional stories" },
-    { name: "Breathing Expert", icon: "🫁", date: "2024-01-25", description: "Practiced breathing for 7 days" },
-    { name: "Emotion Explorer", icon: "🎭", date: "2024-02-01", description: "Identified 10 different emotions" },
-    { name: "Gratitude Champion", icon: "💝", date: "2024-02-05", description: "Wrote 20 gratitude entries" },
-  ];
-
   const moodHistory = [
     { mood: "Happy", count: 15, color: "bg-fun-yellow", emoji: "😊" },
     { mood: "Excited", count: 12, color: "bg-fun-orange", emoji: "🤩" },
